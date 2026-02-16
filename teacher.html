@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Учитель - Преломление света</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .teacher-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            height: 100vh;
+            padding: 20px;
+        }
+        
+        .students-panel {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .student-card {
+            background: rgba(79, 172, 254, 0.1);
+            border: 1px solid rgba(79, 172, 254, 0.3);
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .student-card:hover {
+            transform: translateX(10px);
+            background: rgba(79, 172, 254, 0.2);
+        }
+        
+        .student-card.selected {
+            border: 2px solid #4facfe;
+            background: rgba(79, 172, 254, 0.3);
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            transition: width 0.3s ease;
+        }
+        
+        .live-preview {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            border-left: 3px solid #43e97b;
+        }
+        
+        .leaderboard-panel {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+        }
+        
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .timer-large {
+            font-size: 3rem;
+            font-family: monospace;
+            text-align: center;
+            color: #4facfe;
+            text-shadow: 0 0 20px rgba(79, 172, 254, 0.5);
+            margin: 20px 0;
+        }
+        
+        .control-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="teacher-dashboard">
+        <!-- Левая панель - список учеников -->
+        <div class="students-panel">
+            <div class="flex-between">
+                <h2><i class="fas fa-users"></i> УЧЕНИКИ</h2>
+                <button class="glass-btn glass-btn-primary" onclick="createNewExam()">
+                    <i class="fas fa-plus"></i> Создать тест
+                </button>
+            </div>
+            
+            <div class="timer-large" id="globalTimer">15:00</div>
+            
+            <div class="control-buttons">
+                <button class="glass-btn glass-btn-success" onclick="startExam()">
+                    <i class="fas fa-play"></i> СТАРТ
+                </button>
+                <button class="glass-btn glass-btn-warning" onclick="pauseExam()">
+                    <i class="fas fa-pause"></i> ПАУЗА
+                </button>
+                <button class="glass-btn glass-btn-danger" onclick="resetExam()">
+                    <i class="fas fa-stop"></i> СТОП
+                </button>
+                <button class="glass-btn glass-btn-info" onclick="showLeaderboard()">
+                    <i class="fas fa-trophy"></i> ЛИДЕРЫ
+                </button>
+            </div>
+            
+            <div id="studentsList"></div>
+        </div>
+        
+        <!-- Правая панель - лидерборд и превью -->
+        <div class="leaderboard-panel">
+            <h2><i class="fas fa-trophy"></i> ЛИДЕРЫ</h2>
+            <div id="leaderboardList"></div>
+            
+            <h2 style="margin-top: 30px;"><i class="fas fa-eye"></i> ПРЕВЬЮ</h2>
+            <div id="livePreview" class="live-preview">
+                Выберите ученика для просмотра
+            </div>
+            
+            <div class="stats" style="margin-top: 20px;">
+                <div>✅ Завершили: <span id="completedCount">0</span>/<span id="totalStudents">0</span></div>
+                <div>⏳ Среднее время: <span id="avgTime">0</span> мин</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модалка с превью ученика -->
+    <div id="studentModal" class="modal" style="display:none;">
+        <div class="modal-content glass-panel">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+    
+    <script src="firebase-config.js"></script>
+    <script src="physics-data.js"></script>
+    <script>
+        let currentExamId = null;
+        let selectedStudent = null;
+        
+        function createNewExam() {
+            const examCode = Math.floor(100000 + Math.random() * 900000).toString();
+            currentExamId = "exam_" + examCode;
+            
+            const examData = {
+                id: currentExamId,
+                created: Date.now(),
+                status: "waiting",
+                startTime: null,
+                timeLimit: EXAM_DATA.timeLimit,
+                tasks: EXAM_DATA.tasks,
+                students: {},
+                leaderboard: {}
+            };
+            
+            db.ref('exams/' + currentExamId).set(examData).then(() => {
+                alert(`✅ Тест создан! Код: ${examCode}`);
+                listenToExam();
+            });
+        }
+        
+        function listenToExam() {
+            if (!currentExamId) return;
+            
+            db.ref(`exams/${currentExamId}`).on('value', (snapshot) => {
+                const exam = snapshot.val();
+                if (!exam) return;
+                
+                updateTimer(exam);
+                updateStudentsList(exam);
+                updateLeaderboard(exam);
+            });
+        }
+        
+        function updateTimer(exam) {
+            if (!exam.startTime) return;
+            
+            const elapsed = Math.floor((Date.now() - exam.startTime) / 1000);
+            const remaining = Math.max(0, exam.timeLimit - elapsed);
+            
+            const mins = Math.floor(remaining / 60);
+            const secs = remaining % 60;
+            document.getElementById('globalTimer').textContent = 
+                `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+        }
+        
+        function updateStudentsList(exam) {
+            const students = exam.students || {};
+            const container = document.getElementById('studentsList');
+            
+            container.innerHTML = Object.entries(students).map(([name, data]) => `
+                <div class="student-card ${selectedStudent === name ? 'selected' : ''}" 
+                     onclick="selectStudent('${name}')">
+                    <div class="flex-between">
+                        <strong>${name}</strong>
+                        <span>${data.score || 0} ⭐</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width:${data.progress || 0}%"></div>
+                    </div>
+                    <div>Задание ${data.currentTask || 1}/${EXAM_DATA.totalTasks}</div>
+                    <div class="live-preview">
+                        ${data.lastAction || 'Ожидание...'}
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('totalStudents').textContent = Object.keys(students).length;
+            document.getElementById('completedCount').textContent = 
+                Object.values(students).filter(s => s.progress === 100).length;
+        }
+        
+        function updateLeaderboard(exam) {
+            const students = exam.students || {};
+            const sorted = Object.entries(students)
+                .sort((a, b) => (b[1].score || 0) - (a[1].score || 0))
+                .slice(0, 10);
+            
+            document.getElementById('leaderboardList').innerHTML = sorted.map(([name, data], index) => `
+                <div class="leaderboard-item">
+                    <span>${index + 1}. ${name}</span>
+                    <span>${data.score || 0} ⭐</span>
+                </div>
+            `).join('');
+        }
+        
+        function selectStudent(name) {
+            selectedStudent = name;
+            const exam = currentExamId ? db.ref(`exams/${currentExamId}`) : null;
+            if (!exam) return;
+            
+            db.ref(`exams/${currentExamId}/students/${name}`).once('value', (snapshot) => {
+                const student = snapshot.val();
+                showStudentModal(name, student);
+            });
+        }
+        
+        function showStudentModal(name, student) {
+            const modal = document.getElementById('studentModal');
+            const content = document.getElementById('modalContent');
+            
+            content.innerHTML = `
+                <h2>${name}</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">⭐ Очки: ${student.score || 0}</div>
+                    <div class="stat-item">📊 Прогресс: ${student.progress || 0}%</div>
+                    <div class="stat-item">⏱️ Время: ${Math.floor(student.timeSpent / 60)} мин</div>
+                </div>
+                <h3>История действий:</h3>
+                <div class="actions-log">
+                    ${(student.actions || []).map(action => `
+                        <div class="action-item">
+                            ${action.time}: ${action.description}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('studentModal').style.display = 'none';
+        }
+        
+        function startExam() {
+            if (!currentExamId) {
+                alert('Сначала создайте тест!');
+                return;
+            }
+            
+            db.ref(`exams/${currentExamId}`).update({
+                status: "active",
+                startTime: Date.now()
+            });
+        }
+        
+        function pauseExam() {
+            if (!currentExamId) return;
+            db.ref(`exams/${currentExamId}`).update({ status: "paused" });
+        }
+        
+        function resetExam() {
+            if (!currentExamId || !confirm('Сбросить тест?')) return;
+            db.ref(`exams/${currentExamId}`).remove();
+            currentExamId = null;
+            document.getElementById('studentsList').innerHTML = '';
+            document.getElementById('leaderboardList').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
