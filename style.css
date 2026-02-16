@@ -1,0 +1,237 @@
+/* =========================================
+   style.css - GLASSMORPHISM СТИЛИ
+   ========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    color: white;
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+/* GLASS КОНТЕЙНЕРЫ */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.glass-panel:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+/* GLASS КНОПКИ */
+.glass-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 28px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: 2px solid transparent;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.glass-btn:hover::before {
+    left: 100%;
+}
+
+.glass-btn-primary {
+    background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.2));
+    border-color: rgba(102,126,234,0.5);
+}
+
+.glass-btn-success {
+    background: linear-gradient(135deg, rgba(67,233,123,0.2), rgba(56,249,215,0.2));
+    border-color: rgba(67,233,123,0.5);
+}
+
+.glass-btn-warning {
+    background: linear-gradient(135deg, rgba(255,158,0,0.2), rgba(255,109,0,0.2));
+    border-color: rgba(255,158,0,0.5);
+}
+
+.glass-btn-danger {
+    background: linear-gradient(135deg, rgba(255,65,108,0.2), rgba(255,75,43,0.2));
+    border-color: rgba(255,65,108,0.5);
+}
+
+.glass-btn-info {
+    background: linear-gradient(135deg, rgba(79,172,254,0.2), rgba(0,242,254,0.2));
+    border-color: rgba(79,172,254,0.5);
+}
+
+/* GLASS ИНПУТЫ */
+.glass-input {
+    width: 100%;
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 16px;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    margin: 10px 0;
+}
+
+.glass-input:focus {
+    outline: none;
+    border-color: #4facfe;
+    background: rgba(79,172,254,0.15);
+    box-shadow: 0 0 0 4px rgba(79,172,254,0.1);
+}
+
+.glass-input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+
+/* ЛОАДЕР */
+.loader {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255,255,255,0.1);
+    border-top: 4px solid #4facfe;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* СЕТКИ */
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* АНИМАЦИИ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* МОДАЛКА */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 30px;
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 2rem;
+    cursor: pointer;
+    color: rgba(255,255,255,0.7);
+    transition: all 0.2s ease;
+}
+
+.close:hover {
+    color: white;
+    transform: scale(1.1);
+}
+
+/* СКРОЛЛБАР */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.05);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    border-radius: 5px;
+}
+
+/* АДАПТИВНОСТЬ */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    
+    .glass-btn {
+        padding: 14px 24px;
+        font-size: 1rem;
+    }
+    
+    .glass-input {
+        padding: 14px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .glass-panel {
+        padding: 15px;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+}
