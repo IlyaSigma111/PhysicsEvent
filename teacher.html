@@ -59,6 +59,12 @@
             margin-bottom: 30px;
         }
 
+        h1 {
+            color: #ffd89c;
+            font-size: 2rem;
+            font-weight: 400;
+        }
+
         .create-btn {
             background: linear-gradient(145deg, #b45f1b, #7b3f0e);
             border: 1px solid #ffb45b;
@@ -122,6 +128,7 @@
             border-radius: 30px;
             cursor: pointer;
             transition: all 0.2s ease;
+            font-size: 1.1rem;
         }
 
         .control-btn:active {
@@ -133,6 +140,9 @@
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 15px;
             margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 5px;
         }
 
         .student-card {
@@ -140,7 +150,6 @@
             border: 1px solid rgba(255, 180, 80, 0.2);
             border-radius: 25px;
             padding: 20px;
-            cursor: pointer;
             transition: all 0.2s ease;
         }
 
@@ -169,191 +178,346 @@
             transition: width 0.3s ease;
         }
 
+        .student-stats {
+            display: flex;
+            justify-content: space-between;
+            color: #e5c7a2;
+            font-size: 0.9rem;
+        }
+
         .leaderboard-item {
             display: flex;
             justify-content: space-between;
             padding: 15px;
             border-bottom: 1px solid rgba(255, 180, 80, 0.2);
             color: #ffd9a5;
+            font-size: 1.1rem;
         }
 
-        .rank-1 { color: gold; }
-        .rank-2 { color: silver; }
+        .rank-1 { color: #ffd700; }
+        .rank-2 { color: #c0c0c0; }
         .rank-3 { color: #cd7f32; }
 
+        .stats-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 180, 80, 0.2);
+            color: #e5c7a2;
+            font-size: 1.1rem;
+        }
+
+        .stats-footer div {
+            margin: 10px 0;
+        }
+
         .hidden {
-            display: none;
+            display: none !important;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: #b98f5a;
+            font-size: 1.2rem;
         }
     </style>
 </head>
 <body>
     <div class="dashboard">
+        <!-- ЛЕВАЯ ПАНЕЛЬ -->
         <div class="panel">
             <div class="header">
-                <h1 style="color: #ffd89c;">👨‍🌾 поле</h1>
-                <button class="create-btn" onclick="createExam()">
-                    🌾 создать поле
+                <h1>👨‍🌾 поле</h1>
+                <button class="create-btn" onclick="createGame()">
+                    🌾 создать игру
                 </button>
             </div>
 
+            <!-- КОД ИГРЫ -->
             <div id="codeSection" class="hidden">
                 <div class="code-box">
-                    <div class="code-label">код поля</div>
-                    <div class="code-number" id="examCode">000000</div>
+                    <div class="code-label">код игры</div>
+                    <div class="code-number" id="gameCode">000000</div>
                 </div>
 
-                <div class="timer" id="globalTimer">15:00</div>
+                <!-- ТАЙМЕР -->
+                <div class="timer" id="globalTimer">20:00</div>
 
+                <!-- КНОПКИ УПРАВЛЕНИЯ -->
                 <div class="controls">
-                    <button class="control-btn" onclick="startExam()">🌅 старт</button>
-                    <button class="control-btn" onclick="pauseExam()">⏸️ пауза</button>
-                    <button class="control-btn" onclick="endExam()">🌾 финиш</button>
+                    <button class="control-btn" onclick="startGame()">🌅 старт</button>
+                    <button class="control-btn" onclick="pauseGame()">⏸️ пауза</button>
+                    <button class="control-btn" onclick="endGame()">🌾 финиш</button>
                 </div>
 
-                <h2 style="color: #ffd89c; margin: 20px 0;">🌾 ученики</h2>
-                <div id="studentsList" class="students-grid"></div>
+                <!-- СПИСОК УЧЕНИКОВ -->
+                <h2 style="color: #ffd89c; margin: 20px 0 10px 0;">🌾 ученики</h2>
+                <div id="studentsList" class="students-grid">
+                    <div class="empty-state">ждём путников...</div>
+                </div>
             </div>
 
-            <div id="noExam" style="text-align: center; padding: 50px; color: #b98f5a;">
-                🌅 создай поле, чтобы начать
+            <!-- ПУСТОЕ СОСТОЯНИЕ -->
+            <div id="noGame" class="empty-state">
+                🌅 создай игру, чтобы начать
             </div>
         </div>
 
+        <!-- ПРАВАЯ ПАНЕЛЬ (ЛИДЕРБОРД) -->
         <div class="panel">
             <h2 style="color: #ffd89c; margin-bottom: 25px;">🏆 лидеры</h2>
-            <div id="leaderboardList"></div>
+            <div id="leaderboardList">
+                <div class="empty-state">пока нет результатов</div>
+            </div>
             
-            <div style="margin-top: 30px; color: #e5c7a2;">
+            <div class="stats-footer">
                 <div>✅ завершили: <span id="completedCount">0</span></div>
                 <div>🌾 всего: <span id="totalCount">0</span></div>
+                <div>✨ средний балл: <span id="avgScore">0</span></div>
             </div>
         </div>
     </div>
 
     <script src="firebase-config.js"></script>
     <script>
-        let currentExamId = null;
-        let examStartTime = null;
+        // ============================================
+        // teacher.js - ИСПРАВЛЕННАЯ ВЕРСИЯ
+        // ============================================
+
+        let currentGameId = null;
+        let gameStartTime = null;
         let timerInterval = null;
 
-        function createExam() {
-            const code = Math.floor(100000 + Math.random() * 900000).toString();
-            currentExamId = `exam_${code}`;
+        // DOM элементы
+        const noGame = document.getElementById('noGame');
+        const codeSection = document.getElementById('codeSection');
+        const gameCode = document.getElementById('gameCode');
+        const globalTimer = document.getElementById('globalTimer');
+        const studentsList = document.getElementById('studentsList');
+        const leaderboardList = document.getElementById('leaderboardList');
+        const completedCount = document.getElementById('completedCount');
+        const totalCount = document.getElementById('totalCount');
+        const avgScore = document.getElementById('avgScore');
 
-            const examData = {
-                id: currentExamId,
+        // ===== СОЗДАТЬ ИГРУ =====
+        function createGame() {
+            // Генерируем 6-значный код
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            currentGameId = `game_${code}`;
+
+            const gameData = {
+                id: currentGameId,
                 created: Date.now(),
                 status: "waiting",
                 startTime: null,
-                timeLimit: 20 * 60,
+                timeLimit: 20 * 60, // 20 минут
                 players: {}
             };
 
-            db.ref(`exams/${currentExamId}`).set(examData).then(() => {
-                document.getElementById('noExam').classList.add('hidden');
-                document.getElementById('codeSection').classList.remove('hidden');
-                document.getElementById('examCode').textContent = code;
-                listenToExam();
-            });
+            // Сохраняем в Firebase
+            db.ref(`games/${currentGameId}`).set(gameData)
+                .then(() => {
+                    console.log('✅ Игра создана:', currentGameId);
+                    
+                    // Показываем код
+                    noGame.classList.add('hidden');
+                    codeSection.classList.remove('hidden');
+                    gameCode.textContent = code;
+
+                    // Начинаем слушать игру
+                    listenToGame();
+                })
+                .catch(error => {
+                    console.error('❌ Ошибка создания игры:', error);
+                    alert('Ошибка создания игры. Попробуй еще раз.');
+                });
         }
 
-        function listenToExam() {
-            if (!currentExamId) return;
+        // ===== СЛУШАТЬ ИГРУ =====
+        function listenToGame() {
+            if (!currentGameId) return;
 
-            db.ref(`exams/${currentExamId}`).on('value', (snapshot) => {
-                const exam = snapshot.val();
-                if (!exam) return;
+            db.ref(`games/${currentGameId}`).on('value', (snapshot) => {
+                const game = snapshot.val();
+                if (!game) return;
 
-                updateStudentsList(exam.players);
-                updateLeaderboard(exam.players);
+                // Обновляем список учеников
+                updateStudentsList(game.players);
 
-                if (exam.status === 'active' && exam.startTime) {
-                    examStartTime = exam.startTime;
-                    updateTimer(exam.timeLimit, exam.startTime);
+                // Обновляем лидерборд
+                updateLeaderboard(game.players);
+
+                // Обновляем таймер если игра активна
+                if (game.status === 'active' && game.startTime) {
+                    gameStartTime = game.startTime;
+                    updateTimer(game.timeLimit, game.startTime);
+                }
+
+                // Если игра закончена
+                if (game.status === 'finished') {
+                    clearInterval(timerInterval);
+                    globalTimer.textContent = '00:00';
                 }
             });
         }
 
+        // ===== ОБНОВЛЕНИЕ СПИСКА УЧЕНИКОВ =====
         function updateStudentsList(players) {
-            const list = document.getElementById('studentsList');
-            if (!players) {
-                list.innerHTML = '<div style="color: #b98f5a;">ждём путников...</div>';
+            if (!players || Object.keys(players).length === 0) {
+                studentsList.innerHTML = '<div class="empty-state">ждём путников...</div>';
+                totalCount.textContent = '0';
                 return;
             }
 
             const playerArray = Object.entries(players);
-            document.getElementById('totalCount').textContent = playerArray.length;
+            totalCount.textContent = playerArray.length;
 
-            list.innerHTML = playerArray.map(([name, data]) => `
+            // Сортируем по прогрессу
+            playerArray.sort((a, b) => (b[1].progress || 0) - (a[1].progress || 0));
+
+            studentsList.innerHTML = playerArray.map(([name, data]) => `
                 <div class="student-card">
                     <div class="student-name">${name}</div>
                     <div class="student-progress">
                         <div class="progress-fill" style="width: ${data.progress || 0}%"></div>
                     </div>
-                    <div style="display: flex; justify-content: space-between;">
+                    <div class="student-stats">
                         <span>✨ ${data.score || 0}</span>
                         <span>${data.progress || 0}%</span>
                     </div>
                 </div>
-            `).join(''));
+            `).join('');
         }
 
+        // ===== ОБНОВЛЕНИЕ ЛИДЕРБОРДА =====
         function updateLeaderboard(players) {
-            if (!players) return;
+            if (!players || Object.keys(players).length === 0) {
+                leaderboardList.innerHTML = '<div class="empty-state">пока нет результатов</div>';
+                completedCount.textContent = '0';
+                avgScore.textContent = '0';
+                return;
+            }
 
-            const sorted = Object.entries(players)
-                .filter(([_, d]) => d.score !== undefined)
-                .sort((a, b) => b[1].score - a[1].score)
-                .slice(0, 10);
+            const playerArray = Object.entries(players);
+            
+            // Фильтруем тех, у кого есть очки
+            const withScores = playerArray.filter(([_, d]) => d.score !== undefined);
+            
+            // Сортируем по очкам
+            withScores.sort((a, b) => (b[1].score || 0) - (a[1].score || 0));
 
-            document.getElementById('leaderboardList').innerHTML = sorted.map(([name, data], i) => `
-                <div class="leaderboard-item">
-                    <span class="rank-${i+1}">${i+1}. ${name}</span>
-                    <span>✨ ${data.score}</span>
-                </div>
-            `).join(''));
+            // Показываем топ-10
+            if (withScores.length > 0) {
+                leaderboardList.innerHTML = withScores.slice(0, 10).map(([name, data], i) => `
+                    <div class="leaderboard-item">
+                        <span class="rank-${i+1}">${i+1}. ${name}</span>
+                        <span>✨ ${data.score || 0}</span>
+                    </div>
+                `).join('');
+            } else {
+                leaderboardList.innerHTML = '<div class="empty-state">пока нет результатов</div>';
+            }
 
-            const completed = Object.values(players).filter(p => p.progress === 100).length;
-            document.getElementById('completedCount').textContent = completed;
+            // Считаем статистику
+            const completed = playerArray.filter(([_, d]) => d.progress === 100).length;
+            completedCount.textContent = completed;
+
+            const totalScore = withScores.reduce((acc, [_, d]) => acc + (d.score || 0), 0);
+            const avg = withScores.length > 0 ? Math.round(totalScore / withScores.length) : 0;
+            avgScore.textContent = avg;
         }
 
-        function updateTimer(limit, start) {
+        // ===== ОБНОВЛЕНИЕ ТАЙМЕРА =====
+        function updateTimer(timeLimit, startTime) {
             if (timerInterval) clearInterval(timerInterval);
 
             timerInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - start) / 1000);
-                const remaining = Math.max(0, limit - elapsed);
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const remaining = Math.max(0, timeLimit - elapsed);
                 
                 const mins = Math.floor(remaining / 60);
                 const secs = remaining % 60;
-                document.getElementById('globalTimer').textContent = 
-                    `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+                globalTimer.textContent = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
 
                 if (remaining <= 0) {
                     clearInterval(timerInterval);
-                    endExam();
+                    endGame();
                 }
             }, 1000);
         }
 
-        function startExam() {
-            if (!currentExamId) return;
-            db.ref(`exams/${currentExamId}`).update({
+        // ===== СТАРТ ИГРЫ =====
+        function startGame() {
+            if (!currentGameId) {
+                alert('Сначала создай игру!');
+                return;
+            }
+
+            db.ref(`games/${currentGameId}`).update({
                 status: "active",
                 startTime: Date.now()
+            }).then(() => {
+                console.log('✅ Игра началась');
+            }).catch(error => {
+                console.error('❌ Ошибка:', error);
             });
         }
 
-        function pauseExam() {
-            if (!currentExamId) return;
-            db.ref(`exams/${currentExamId}`).update({ status: "paused" });
+        // ===== ПАУЗА =====
+        function pauseGame() {
+            if (!currentGameId) return;
+
+            db.ref(`games/${currentGameId}`).update({
+                status: "paused"
+            }).then(() => {
+                console.log('⏸️ Игра на паузе');
+            });
         }
 
-        function endExam() {
-            if (!currentExamId) return;
-            db.ref(`exams/${currentExamId}`).update({ status: "finished" });
-            clearInterval(timerInterval);
+        // ===== ЗАВЕРШЕНИЕ =====
+        function endGame() {
+            if (!currentGameId) return;
+
+            if (!confirm('Завершить игру?')) return;
+
+            db.ref(`games/${currentGameId}`).update({
+                status: "finished"
+            }).then(() => {
+                console.log('🏁 Игра завершена');
+                clearInterval(timerInterval);
+                globalTimer.textContent = '00:00';
+            });
         }
+
+        // ===== СБРОС (ВЕРНУТЬСЯ К СОЗДАНИЮ) =====
+        function resetToCreate() {
+            if (currentGameId) {
+                db.ref(`games/${currentGameId}`).off();
+            }
+            
+            currentGameId = null;
+            gameStartTime = null;
+            clearInterval(timerInterval);
+            
+            noGame.classList.remove('hidden');
+            codeSection.classList.add('hidden');
+            
+            // Очищаем списки
+            studentsList.innerHTML = '<div class="empty-state">ждём путников...</div>';
+            leaderboardList.innerHTML = '<div class="empty-state">пока нет результатов</div>';
+            completedCount.textContent = '0';
+            totalCount.textContent = '0';
+            avgScore.textContent = '0';
+            globalTimer.textContent = '20:00';
+        }
+
+        // ===== ФОРМАТИРОВАНИЕ КОДА =====
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('👨‍🌾 Панель учителя загружена');
+            
+            // Очищаем при загрузке
+            resetToCreate();
+        });
     </script>
 </body>
 </html>
