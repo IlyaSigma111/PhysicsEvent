@@ -4,33 +4,30 @@
 
 // Твой конфиг
 const firebaseConfig = {
-    apiKey: "AIzaSyC9OSllGc8U-au0281HfikJkI5caDkqOYc",
-    authDomain: "goydacloud.firebaseapp.com",
-    databaseURL: "https://goydacloud-default-rtdb.firebaseio.com",
-    projectId: "goydacloud",
-    storageBucket: "goydacloud.firebasestorage.app",
-    messagingSenderId: "937429390580",
-    appId: "1:937429390580:web:7be76b6755a07ff6ae7aa1"
+    apiKey: "AIzaSyDpP0_qHk8FaQMFxv3eeeZBnxPszaRfRp8",
+    authDomain: "physicsexams-37cde.firebaseapp.com",
+    projectId: "physicsexams-37cde",
+    storageBucket: "physicsexams-37cde.firebasestorage.app",
+    messagingSenderId: "613032743241",
+    appId: "1:613032743241:web:16ee7a6a7ed46c10918a98"
 };
 
 // Инициализация Firebase
 try {
-    // Проверяем, загружен ли Firebase SDK
+    // Проверяем, загружен ли Firebase
     if (typeof firebase === 'undefined') {
-        throw new Error('Firebase SDK не загружен. Подключи скрипты в HTML!');
+        console.error('❌ Firebase SDK не загружен! Подключи скрипты в HTML');
+    } else {
+        // Инициализируем
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            console.log('✅ Firebase инициализирован');
+        }
+        
+        // Создаём глобальную переменную для БД
+        window.db = firebase.database();
+        console.log('✅ База данных готова');
     }
-    
-    // Инициализируем приложение
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-        console.log('✅ Firebase инициализирован');
-    }
-    
-    // Создаём глобальную переменную для базы данных
-    window.db = firebase.database();
-    console.log('✅ База данных готова');
-    
 } catch (error) {
-    console.error('❌ Ошибка Firebase:', error.message);
-    alert('Ошибка подключения к базе данных: ' + error.message);
+    console.error('❌ Ошибка Firebase:', error);
 }
