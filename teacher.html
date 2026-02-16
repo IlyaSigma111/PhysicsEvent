@@ -3,15 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👨‍🏫 учитель · преломление</title>
-    
-    <!-- Firebase SDK (ВАЖНО: ПОДКЛЮЧАЕМ ДО ВСЕГО) -->
+    <title>👨‍🏫 учитель · интерактив</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    
-    <!-- Наш конфиг -->
     <script src="firebase-config.js"></script>
-    
     <style>
         * {
             margin: 0;
@@ -20,24 +15,10 @@
         }
 
         body {
-            background: linear-gradient(145deg, #2b1b0e, #6b3f1c);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(145deg, #1a0f05, #8b4513);
+            font-family: system-ui, -apple-system, sans-serif;
             min-height: 100vh;
             padding: 20px;
-            position: relative;
-        }
-
-        .sun {
-            position: fixed;
-            top: 5%;
-            right: 5%;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, #ffb347, #ff8c42, transparent);
-            border-radius: 50%;
-            filter: blur(40px);
-            opacity: 0.4;
-            pointer-events: none;
         }
 
         .dashboard {
@@ -46,306 +27,217 @@
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 20px;
-            position: relative;
-            z-index: 10;
         }
 
         .panel {
-            background: rgba(30, 20, 10, 0.85);
+            background: rgba(20, 12, 5, 0.95);
             backdrop-filter: blur(10px);
-            border-radius: 40px;
-            padding: 30px;
-            border: 1px solid rgba(255, 180, 80, 0.3);
+            border-radius: 30px;
+            padding: 25px;
+            border: 2px solid #b45f1b;
         }
 
         h1 {
             color: #ffd89c;
-            font-size: 2rem;
-            font-weight: 400;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .btn {
-            background: linear-gradient(45deg, #b45f1b, #7b3f0e);
-            border: 1px solid #ffb45b;
+            background: #b45f1b;
             color: white;
+            border: none;
             padding: 15px 30px;
             border-radius: 30px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn:active {
-            transform: scale(0.95);
-        }
-
-        .btn-large {
-            width: 100%;
-            padding: 18px;
-            font-size: 1.3rem;
-            margin: 20px 0;
+            margin: 5px;
         }
 
         .code-box {
-            background: rgba(0,0,0,0.3);
-            border-radius: 30px;
+            background: #1a0f05;
+            border: 2px solid #b45f1b;
+            border-radius: 20px;
             padding: 20px;
             text-align: center;
             margin: 20px 0;
         }
 
-        .code-label {
-            color: #ffd89c;
-            font-size: 0.9rem;
-        }
-
-        .code-number {
+        .code {
             font-size: 5rem;
             font-family: monospace;
             color: #ffd966;
-            letter-spacing: 15px;
-            line-height: 1.2;
+            letter-spacing: 10px;
         }
 
         .timer {
             font-size: 4rem;
-            font-family: monospace;
             color: #ffd966;
             text-align: center;
-            margin: 30px 0;
+            font-family: monospace;
+            margin: 20px 0;
         }
 
         .controls {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 10px;
-            margin: 30px 0;
-        }
-
-        .control-btn {
-            padding: 15px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid #b45f1b;
-            border-radius: 30px;
-            color: #ffd89c;
-            cursor: pointer;
-        }
-
-        .students-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-            max-height: 400px;
-            overflow-y: auto;
+            margin: 20px 0;
         }
 
         .student-card {
-            background: rgba(0,0,0,0.3);
+            background: #1a0f05;
             border: 1px solid #b45f1b;
-            border-radius: 25px;
-            padding: 20px;
-        }
-
-        .student-name {
+            border-radius: 20px;
+            padding: 15px;
+            margin: 10px 0;
             color: #ffd89c;
-            font-size: 1.2rem;
-            margin-bottom: 10px;
         }
 
         .progress-bar {
-            height: 8px;
-            background: rgba(0,0,0,0.3);
+            height: 10px;
+            background: #2a1a0a;
             border-radius: 10px;
-            overflow: hidden;
             margin: 10px 0;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #ffb45b, #ffd966);
+            background: #b45f1b;
+            border-radius: 10px;
             width: 0%;
         }
 
         .leaderboard-item {
             display: flex;
             justify-content: space-between;
-            padding: 12px;
-            border-bottom: 1px solid rgba(255,180,80,0.2);
-            color: #ffd9a5;
-        }
-
-        .stats {
-            margin-top: 30px;
-            color: #e5b87b;
+            padding: 10px;
+            border-bottom: 1px solid #b45f1b;
+            color: #ffd89c;
         }
 
         .hidden {
             display: none;
         }
-
-        .empty {
-            color: #b98f5a;
-            text-align: center;
-            padding: 40px;
-        }
     </style>
 </head>
 <body>
-    <div class="sun"></div>
-
     <div class="dashboard">
         <!-- Левая панель -->
         <div class="panel">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h1>👨‍🏫 учитель</h1>
-                <button class="btn" onclick="createGame()">➕ создать игру</button>
-            </div>
+            <h1>👨‍🏫 учитель</h1>
+            <button class="btn" onclick="createGame()">🎮 создать игру</button>
 
-            <!-- Нет игры -->
-            <div id="noGame" class="empty">
-                🌅 создай игру, чтобы начать
-            </div>
-
-            <!-- Есть игра -->
             <div id="gamePanel" class="hidden">
                 <div class="code-box">
-                    <div class="code-label">код игры</div>
-                    <div class="code-number" id="gameCode">000000</div>
+                    <div style="color: #b45f1b;">код игры</div>
+                    <div class="code" id="gameCode">000000</div>
                 </div>
 
                 <div class="timer" id="timer">20:00</div>
 
                 <div class="controls">
-                    <button class="control-btn" onclick="startGame()">🌅 старт</button>
-                    <button class="control-btn" onclick="pauseGame()">⏸️ пауза</button>
-                    <button class="control-btn" onclick="endGame()">🏁 финиш</button>
+                    <button class="btn" onclick="startGame()">▶ старт</button>
+                    <button class="btn" onclick="pauseGame()">⏸ пауза</button>
+                    <button class="btn" onclick="endGame()">⏹ финиш</button>
                 </div>
 
-                <h2 style="color: #ffd89c; margin: 20px 0;">👥 ученики</h2>
-                <div id="studentsList" class="students-grid"></div>
+                <h2>👥 ученики</h2>
+                <div id="studentsList"></div>
+            </div>
+
+            <div id="noGame" style="text-align: center; color: #b45f1b; padding: 40px;">
+                🌅 создай игру чтобы начать
             </div>
         </div>
 
-        <!-- Правая панель (лидерборд) -->
+        <!-- Правая панель -->
         <div class="panel">
             <h1>🏆 лидеры</h1>
             <div id="leaderboard"></div>
-            
-            <div class="stats" id="stats">
-                <div>👥 всего: <span id="totalCount">0</span></div>
-                <div>✅ завершили: <span id="completedCount">0</span></div>
-            </div>
+            <div style="margin-top: 20px; color: #ffd89c;" id="stats"></div>
         </div>
     </div>
 
     <script>
-        // ============================================
-        // teacher.js
-        // ============================================
-
         let currentGameId = null;
-        let gameStartTime = null;
         let timerInterval = null;
 
-        // Проверяем, что Firebase загружен
-        if (typeof db === 'undefined') {
-            console.error('❌ Firebase не загружен!');
-        }
-
-        // ===== СОЗДАТЬ ИГРУ =====
         function createGame() {
-            if (typeof db === 'undefined') {
-                alert('❌ Ошибка: Firebase не загружен! Обнови страницу.');
-                return;
-            }
-
             const code = Math.floor(100000 + Math.random() * 900000).toString();
             currentGameId = `game_${code}`;
 
-            const gameData = {
+            db.ref(`games/${currentGameId}`).set({
                 id: currentGameId,
-                created: Date.now(),
-                status: "waiting",
+                status: 'waiting',
                 startTime: null,
-                timeLimit: 20 * 60, // 20 минут
+                timeLimit: 1200,
                 players: {}
-            };
-
-            db.ref(`games/${currentGameId}`).set(gameData).then(() => {
+            }).then(() => {
                 document.getElementById('noGame').classList.add('hidden');
                 document.getElementById('gamePanel').classList.remove('hidden');
                 document.getElementById('gameCode').textContent = code;
-
                 listenToGame();
-            }).catch(error => {
-                console.error('❌ Ошибка создания игры:', error);
-                alert('Ошибка создания игры: ' + error.message);
             });
         }
 
-        // ===== СЛУШАТЬ =====
         function listenToGame() {
-            db.ref(`games/${currentGameId}`).on('value', (snapshot) => {
-                const game = snapshot.val();
+            db.ref(`games/${currentGameId}`).on('value', (snap) => {
+                const game = snap.val();
                 if (!game) return;
 
-                updateStudentsList(game.players);
+                updatePlayers(game.players);
                 updateLeaderboard(game.players);
 
                 if (game.status === 'active' && game.startTime) {
-                    gameStartTime = game.startTime;
                     updateTimer(game.timeLimit, game.startTime);
                 }
             });
         }
 
-        // ===== СПИСОК УЧЕНИКОВ =====
-        function updateStudentsList(players) {
+        function updatePlayers(players) {
             const list = document.getElementById('studentsList');
-            if (!players || Object.keys(players).length === 0) {
-                list.innerHTML = '<div class="empty">ждём учеников...</div>';
+            if (!players) {
+                list.innerHTML = '<div style="color: #b45f1b;">ждём учеников...</div>';
                 return;
             }
 
             list.innerHTML = Object.entries(players).map(([name, data]) => `
                 <div class="student-card">
-                    <div class="student-name">${name}</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${(data.progress || 0) * 5}%"></div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>👤 ${name}</span>
+                        <span>задание ${data.task || 1}/10</span>
                     </div>
-                    <div style="color: #e5b87b;">${data.progress || 0}/20</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${((data.task || 1)-1)*10}%"></div>
+                    </div>
                 </div>
             `).join('');
         }
 
-        // ===== ЛИДЕРБОРД =====
         function updateLeaderboard(players) {
             if (!players) return;
 
             const sorted = Object.entries(players)
-                .sort((a, b) => (b[1].progress || 0) - (a[1].progress || 0))
+                .sort((a, b) => (b[1].task || 1) - (a[1].task || 1))
                 .slice(0, 5);
 
             document.getElementById('leaderboard').innerHTML = sorted.map(([name, data], i) => `
                 <div class="leaderboard-item">
                     <span>${i+1}. ${name}</span>
-                    <span>${data.progress || 0}/20</span>
+                    <span>задание ${data.task || 1}</span>
                 </div>
             `).join('');
 
             const total = Object.keys(players).length;
-            const completed = Object.values(players).filter(p => p.progress === 20).length;
-            
-            document.getElementById('totalCount').textContent = total;
-            document.getElementById('completedCount').textContent = completed;
+            const avg = Object.values(players).reduce((acc, p) => acc + (p.task || 1), 0) / total || 0;
+            document.getElementById('stats').innerHTML = `
+                <div>👥 всего: ${total}</div>
+                <div>📊 среднее: задание ${avg.toFixed(1)}</div>
+            `;
         }
 
-        // ===== ТАЙМЕР =====
         function updateTimer(limit, start) {
             if (timerInterval) clearInterval(timerInterval);
-
             timerInterval = setInterval(() => {
                 const elapsed = Math.floor((Date.now() - start) / 1000);
                 const remaining = Math.max(0, limit - elapsed);
@@ -353,32 +245,25 @@
                 const secs = remaining % 60;
                 document.getElementById('timer').textContent = 
                     `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
-
-                if (remaining <= 0) {
-                    clearInterval(timerInterval);
-                }
             }, 1000);
         }
 
-        // ===== СТАРТ =====
         function startGame() {
             if (!currentGameId) return;
             db.ref(`games/${currentGameId}`).update({
-                status: "active",
+                status: 'active',
                 startTime: Date.now()
             });
         }
 
-        // ===== ПАУЗА =====
         function pauseGame() {
             if (!currentGameId) return;
-            db.ref(`games/${currentGameId}`).update({ status: "paused" });
+            db.ref(`games/${currentGameId}`).update({ status: 'paused' });
         }
 
-        // ===== ФИНИШ =====
         function endGame() {
             if (!currentGameId) return;
-            db.ref(`games/${currentGameId}`).update({ status: "finished" });
+            db.ref(`games/${currentGameId}`).update({ status: 'finished' });
             clearInterval(timerInterval);
         }
     </script>
