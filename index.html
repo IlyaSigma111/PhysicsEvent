@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Физика: Преломление света</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="home-header glass-panel">
+            <div class="logo">🔆</div>
+            <h1>ПРЕЛОМЛЕНИЕ СВЕТА</h1>
+            <p class="subtitle">Интерактивный тест по физике для 9 класса.<br>10 заданий, 15 минут, полный мониторинг в реальном времени.</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-item glass-panel">
+                <div class="stat-icon">⏱️</div>
+                <h4>15 минут</h4>
+                <p>На выполнение всех заданий</p>
+            </div>
+            <div class="stat-item glass-panel">
+                <div class="stat-icon">🧪</div>
+                <h4>10 заданий</h4>
+                <p>Разной сложности</p>
+            </div>
+            <div class="stat-item glass-panel">
+                <div class="stat-icon">📱</div>
+                <h4>На телефонах</h4>
+                <p>Оптимизировано для сенсоров</p>
+            </div>
+            <div class="stat-item glass-panel">
+                <div class="stat-icon">👁️</div>
+                <h4>Мониторинг</h4>
+                <p>Учитель видит всё в реальном времени</p>
+            </div>
+        </div>
+
+        <div class="role-selection">
+            <div class="role-card teacher-card glass-panel">
+                <div class="role-icon">👨‍🏫</div>
+                <h3>УЧИТЕЛЬ</h3>
+                <p>Создайте тест и наблюдайте за прогрессом учеников в реальном времени. Видите, кто на каком задании, сколько времени осталось, кто уже закончил.</p>
+                <a href="teacher.html" class="glass-btn glass-btn-primary">
+                    <i class="fas fa-chalkboard-teacher"></i> ПАНЕЛЬ УПРАВЛЕНИЯ
+                </a>
+            </div>
+
+            <div class="role-card student-card glass-panel">
+                <div class="role-icon">🧑‍🎓</div>
+                <h3>УЧЕНИК</h3>
+                <p>Подключитесь с телефона, выполняйте интерактивные задания, перетаскивайте карточки, двигайте ползунки, рисуйте пальцем!</p>
+                <a href="student.html" class="glass-btn glass-btn-success">
+                    <i class="fas fa-mobile-alt"></i> НАЧАТЬ ТЕСТ
+                </a>
+            </div>
+        </div>
+
+        <footer class="home-footer glass-panel">
+            <p>© 2024 Физика 9 класс | Тема: Преломление света</p>
+            <div class="tech-stack">
+                <span class="tech-item">🔥 Firebase Realtime</span>
+                <span class="tech-item">📱 Mobile First</span>
+                <span class="tech-item">✨ Glassmorphism</span>
+            </div>
+            <div id="moderatorSignature" class="moderator-link">
+                <i class="fas fa-user-shield"></i> Панель модератора
+            </div>
+        </footer>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script>
+        document.getElementById('moderatorSignature').addEventListener('click', function() {
+            if (window.moderatorSystem) {
+                moderatorSystem.showPasswordModal();
+            }
+        });
+    </script>
+</body>
+</html>
