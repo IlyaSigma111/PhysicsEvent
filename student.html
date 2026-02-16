@@ -3,502 +3,770 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Тест: Преломление света</title>
+    <title>🔆 Преломление света</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <link rel="stylesheet" href="style.css">
     <style>
-        /* МОБИЛЬНЫЕ СТИЛИ */
         * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
+            user-select: none;
         }
-        
+
         body {
-            background: linear-gradient(135deg, #0f0c29, #302b63);
-            padding: 10px;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(145deg, #0c0a1a 0%, #1a1440 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
         }
-        
-        .exam-container {
-            max-width: 500px;
-            margin: 0 auto;
+
+        .phone-frame {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(20, 15, 40, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 48px;
+            padding: 24px 20px;
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.5),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        
+
+        /* ===== КРУТОЕ ЛОББИ ===== */
+        .lobby {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .lobby-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 80px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 20px 30px rgba(110, 70, 255, 0.5));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .lobby-title {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .lobby-subtitle {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        /* КАРТОЧКА ВХОДА */
+        .join-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 32px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #a78bfa;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 18px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(167, 139, 250, 0.3);
+            border-radius: 24px;
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+        }
+
+        .input-box:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
+        }
+
+        .code-input {
+            font-family: monospace;
+            font-size: 1.8rem;
+            letter-spacing: 8px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .join-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            border: none;
+            border-radius: 40px;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .join-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        /* ЭКРАН ОЖИДАНИЯ */
+        .waiting-screen {
+            text-align: center;
+        }
+
+        .waiting-header {
+            background: linear-gradient(145deg, #2a1f5c, #1a1240);
+            border-radius: 30px;
+            padding: 30px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .waiting-code {
+            font-size: 3.5rem;
+            font-family: monospace;
+            font-weight: 900;
+            color: #c4b5fd;
+            letter-spacing: 10px;
+            margin: 15px 0;
+            text-shadow: 0 0 30px #8b5cf6;
+        }
+
+        .pulse-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #4ade80;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        .players-list {
+            margin-top: 20px;
+        }
+
+        .player-badge {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.2);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 40px;
+            padding: 10px 18px;
+            margin: 5px;
+            font-size: 1rem;
+        }
+
+        /* ЭКРАН ЗАДАНИЯ */
+        .task-screen {
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
         .task-header {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 40px;
+            padding: 15px 20px;
         }
-        
-        .timer {
-            font-size: 2.2rem;
-            font-family: monospace;
-            color: #4facfe;
-            font-weight: 900;
-            text-shadow: 0 0 20px rgba(79,172,254,0.5);
-        }
-        
-        .task-progress {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+
+        .task-counter {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
             padding: 8px 16px;
             border-radius: 30px;
             font-weight: 700;
+            font-size: 0.95rem;
         }
-        
+
+        .task-timer {
+            font-size: 2rem;
+            font-family: monospace;
+            font-weight: 900;
+            color: #fbbf24;
+            text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+        }
+
         .task-card {
-            background: rgba(255,255,255,0.08);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 32px;
             padding: 25px;
             margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        
+
         .task-title {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 800;
-            margin-bottom: 15px;
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff, #cbd5e1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
+
         .task-description {
-            font-size: 1.2rem;
-            color: rgba(255,255,255,0.9);
+            color: #94a3b8;
             margin-bottom: 25px;
+            font-size: 1.1rem;
             line-height: 1.5;
         }
-        
-        /* КНОПКИ ДЛЯ ПАЛЬЦЕВ */
-        .option-grid {
-            display: grid;
+
+        /* КНОПКИ ОТВЕТОВ */
+        .options-grid {
+            display: flex;
+            flex-direction: column;
             gap: 12px;
-            margin: 20px 0;
+            margin: 25px 0;
         }
-        
+
         .option-btn {
             width: 100%;
-            padding: 22px;
-            font-size: 1.2rem;
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
             color: white;
-            cursor: pointer;
-            transition: all 0.1s ease;
+            font-size: 1.2rem;
             text-align: left;
+            cursor: pointer;
+            transition: all 0.15s ease;
             display: flex;
             align-items: center;
             gap: 15px;
         }
-        
+
         .option-btn:active {
+            background: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
             transform: scale(0.98);
-            background: rgba(79, 172, 254, 0.3);
-            border-color: #4facfe;
         }
-        
+
         .option-btn.selected {
-            background: rgba(79, 172, 254, 0.4);
-            border-color: #4facfe;
+            background: rgba(139, 92, 246, 0.3);
+            border-color: #8b5cf6;
         }
-        
-        /* КАРТОЧКИ ДЛЯ MEMORY GAME */
-        .memory-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+
+        .option-prefix {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #a78bfa;
+        }
+
+        /* ПОЛЕ ДЛЯ ЧИСЛОВОГО ОТВЕТА */
+        .number-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 2rem;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            border-radius: 30px;
+            color: white;
             margin: 20px 0;
         }
-        
-        .memory-card {
-            aspect-ratio: 1;
-            background: rgba(255,255,255,0.08);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
+
+        .number-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+
+        /* ПЕРЕВЕРТЫШИ (ИСПРАВЛЕННЫЕ) */
+        .flip-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .flip-card {
+            aspect-ratio: 1 / 1;
+            background: rgba(139, 92, 246, 0.1);
+            border: 2px solid rgba(139, 92, 246, 0.2);
+            border-radius: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 15px;
+            padding: 20px;
             font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s ease;
             transform-style: preserve-3d;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
-        
-        .memory-card.flipped {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+
+        .flip-card.flipped {
+            background: linear-gradient(145deg, #8b5cf6, #6366f1);
+            border-color: #a78bfa;
             transform: rotateY(180deg);
         }
-        
-        .memory-card.matched {
-            opacity: 0.3;
+
+        .flip-card.matched {
+            opacity: 0.4;
+            cursor: default;
             pointer-events: none;
-            filter: grayscale(1);
+            filter: grayscale(0.5);
+            transform: scale(0.95);
         }
-        
-        /* СЛАЙДЕР */
-        .slider-container {
-            padding: 30px 0;
-            margin: 20px 0;
+
+        .flip-card.matched.flipped {
+            background: #4ade80;
         }
-        
-        .slider-label {
+
+        .flip-card .front,
+        .flip-card .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border-radius: 24px;
         }
-        
-        input[type=range] {
+
+        .flip-card .front {
+            transform: rotateY(0deg);
+        }
+
+        .flip-card .back {
+            transform: rotateY(180deg);
+        }
+
+        /* ЛАЗЕР (canvas) */
+        .laser-canvas {
             width: 100%;
-            height: 20px;
-            -webkit-appearance: none;
-            background: linear-gradient(90deg, #4facfe, #00f2fe);
-            border-radius: 20px;
-            outline: none;
-        }
-        
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 50px;
-            height: 50px;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            border: 3px solid #4facfe;
-            cursor: pointer;
-        }
-        
-        /* КАНВАС ДЛЯ РИСОВАНИЯ */
-        .drawing-canvas {
-            width: 100%;
-            height: 300px;
-            background: rgba(0,0,0,0.3);
+            height: 250px;
+            background: rgba(0, 0, 0, 0.2);
             border-radius: 30px;
             margin: 20px 0;
             touch-action: none;
-            border: 2px solid rgba(255,255,255,0.1);
         }
-        
-        .action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 25px;
-        }
-        
+
+        /* КНОПКА ОТВЕТА */
         .submit-btn {
-            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            width: 100%;
+            padding: 22px;
+            background: linear-gradient(135deg, #4ade80, #22c55e);
             border: none;
+            border-radius: 40px;
             color: white;
             font-size: 1.3rem;
             font-weight: 700;
-            padding: 22px;
-            border-radius: 40px;
             cursor: pointer;
             transition: all 0.2s ease;
+            margin-top: 15px;
         }
-        
+
         .submit-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.97);
         }
-        
-        /* АНИМАЦИИ */
-        @keyframes correctFlash {
-            0% { background: rgba(67, 233, 123, 0.3); }
-            100% { background: transparent; }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
         }
-        
-        .correct-flash {
-            animation: correctFlash 0.5s ease;
-        }
-        
+
         /* ЛИДЕРБОРД */
-        .leaderboard-panel {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            padding: 25px;
-            margin-top: 20px;
+        .leaderboard-screen {
+            text-align: center;
         }
-        
-        .leaderboard-item {
+
+        .leaderboard-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 32px;
+            padding: 25px;
+        }
+
+        .rank-item {
             display: flex;
             justify-content: space-between;
-            padding: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             font-size: 1.2rem;
         }
-        
+
         .rank-1 { color: gold; }
         .rank-2 { color: silver; }
         .rank-3 { color: #cd7f32; }
+
+        .final-score {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #fbbf24;
+            margin: 20px 0;
+        }
+
+        .exit-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 20px;
+        }
+
+        /* УТИЛИТЫ */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-    <div class="exam-container">
-        <!-- ЭКРАН ВХОДА -->
-        <div id="joinScreen" class="active">
-            <div class="task-header">
+    <div class="phone-frame">
+        <!-- ЛОББИ (ВХОД) -->
+        <div id="lobbyScreen" class="lobby">
+            <div class="lobby-header">
                 <div class="logo">🔆</div>
-                <div>Преломление света</div>
+                <div class="lobby-title">Преломление света</div>
+                <div class="lobby-subtitle">8 заданий · 15 минут</div>
             </div>
-            
-            <div class="task-card">
-                <h2>Вход в тест</h2>
-                <div class="form-group">
-                    <label>Твоё имя:</label>
-                    <input type="text" id="studentName" class="glass-input" placeholder="Алиса" maxlength="15">
+
+            <div class="join-card">
+                <div class="input-field">
+                    <label class="input-label">ТВОЁ ИМЯ</label>
+                    <input type="text" id="playerName" class="input-box" placeholder="Алиса" maxlength="15">
                 </div>
-                
-                <div class="form-group">
-                    <label>Код теста:</label>
-                    <input type="text" id="examCode" class="glass-input" placeholder="000000" maxlength="6">
+
+                <div class="input-field">
+                    <label class="input-label">КОД ТЕСТА</label>
+                    <input type="text" id="examCode" class="input-box code-input" placeholder="000000" maxlength="6" inputmode="numeric">
                 </div>
-                
-                <button class="submit-btn" onclick="joinExam()">
-                    <i class="fas fa-play"></i> НАЧАТЬ
+
+                <button class="join-btn" onclick="joinExam()">
+                    <i class="fas fa-play"></i> ВОЙТИ
                 </button>
             </div>
-        </div>
-        
-        <!-- ЭКРАН ОЖИДАНИЯ -->
-        <div id="waitingScreen" style="display:none;">
-            <div class="task-header">
-                <div>⏳ Ожидание</div>
-                <div id="waitTimer">00:00</div>
+
+            <div class="text-center" style="color: #64748b; font-size: 0.9rem;">
+                <i class="fas fa-info-circle"></i> Спроси код у учителя
             </div>
-            
-            <div class="task-card" style="text-align: center;">
-                <div class="loader" style="margin: 40px auto;"></div>
-                <h3>Учитель скоро начнёт тест</h3>
-                <p id="waitMessage">Подключено к тесту. Ждём старта...</p>
-                
-                <div class="leaderboard-panel">
-                    <h4>Участники:</h4>
-                    <div id="participantsList"></div>
+        </div>
+
+        <!-- ЭКРАН ОЖИДАНИЯ (КРУТОЙ) -->
+        <div id="waitingScreen" class="waiting-screen hidden">
+            <div class="waiting-header">
+                <div class="pulse-dot"></div>
+                <span style="color: #94a3b8;">ОЖИДАНИЕ СТАРТА</span>
+                <div class="waiting-code" id="displayCode">000000</div>
+                <div style="font-size: 1rem; color: #cbd5e1;">Ты: <span id="displayName"></span></div>
+            </div>
+
+            <div style="margin: 25px 0;">
+                <div style="color: #a78bfa; margin-bottom: 15px;">УЧАСТНИКИ</div>
+                <div id="playersList" class="players-list">
+                    <span class="player-badge">👤 Ожидание...</span>
                 </div>
             </div>
-        </div>
-        
-        <!-- ЭКРАН ЗАДАНИЯ -->
-        <div id="taskScreen" style="display:none;">
-            <div class="task-header">
-                <div class="task-progress" id="currentTaskNum">1/10</div>
-                <div class="timer" id="taskTimer">15:00</div>
+
+            <div style="color: #64748b; font-size: 0.9rem;">
+                <i class="fas fa-users"></i> Всего: <span id="playerCount">1</span>
             </div>
-            
+        </div>
+
+        <!-- ЭКРАН ЗАДАНИЯ -->
+        <div id="taskScreen" class="task-screen hidden">
+            <div class="task-header">
+                <div class="task-counter" id="taskCounter">1/8</div>
+                <div class="task-timer" id="taskTimer">15:00</div>
+            </div>
+
             <div id="taskContent" class="task-card">
                 <!-- Сюда загружается задание -->
             </div>
-            
-            <div class="action-buttons">
-                <button class="submit-btn" onclick="submitAnswer()" id="submitBtn">
-                    ОТВЕТИТЬ
-                </button>
-                <button class="glass-btn" onclick="nextTask()" id="nextBtn" style="display:none;">
-                    ДАЛЬШЕ →
-                </button>
-            </div>
+
+            <button class="submit-btn" id="submitBtn" onclick="submitAnswer()">
+                ОТВЕТИТЬ
+            </button>
+
+            <button class="submit-btn" id="nextBtn" style="display: none; background: linear-gradient(135deg, #8b5cf6, #6366f1);" onclick="nextTask()">
+                ДАЛЬШЕ →
+            </button>
         </div>
-        
-        <!-- ЭКРАН РЕЗУЛЬТАТОВ -->
-        <div id="resultScreen" style="display:none;">
+
+        <!-- ЭКРАН ЛИДЕРБОРДА -->
+        <div id="leaderboardScreen" class="leaderboard-screen hidden">
             <div class="task-header">
-                <div>🏆 РЕЗУЛЬТАТЫ</div>
-                <div id="finalTimer">00:00</div>
+                <div class="task-counter">🏆 ФИНИШ</div>
+                <div class="task-timer" id="finalTimer">00:00</div>
             </div>
-            
-            <div class="task-card" style="text-align: center;">
-                <h2 id="finalScore">0 очков</h2>
-                <div id="finalRank"></div>
-                
-                <div class="leaderboard-panel" id="finalLeaderboard">
-                    <!-- Лидерборд -->
+
+            <div class="leaderboard-card">
+                <div class="final-score" id="finalScore">0</div>
+                <div id="finalRank" style="font-size: 1.3rem; margin-bottom: 25px;">Твоё место: -</div>
+
+                <div id="leaderboardList" style="margin: 25px 0;">
+                    <!-- Лидерборд загружается -->
                 </div>
-                
-                <button class="submit-btn" onclick="exitExam()">
-                    ВЫЙТИ
+
+                <button class="join-btn exit-btn" onclick="exitExam()">
+                    <i class="fas fa-sign-out-alt"></i> ВЫЙТИ
                 </button>
             </div>
         </div>
     </div>
-    
+
     <script src="firebase-config.js"></script>
     <script src="physics-data.js"></script>
     <script>
+        // ============================================
+        // student.js - ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ВЕРСИЯ
+        // ============================================
+
         let currentExamId = null;
-        let studentName = null;
+        let playerName = null;
         let currentTaskIndex = 0;
-        let studentData = {};
+        let playerScore = 0;
         let examStartTime = null;
+        let timerInterval = null;
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let selectedOption = null;
         
+        // DOM элементы
+        const lobbyScreen = document.getElementById('lobbyScreen');
+        const waitingScreen = document.getElementById('waitingScreen');
+        const taskScreen = document.getElementById('taskScreen');
+        const leaderboardScreen = document.getElementById('leaderboardScreen');
+        const submitBtn = document.getElementById('submitBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
         // ===== ВХОД В ТЕСТ =====
         function joinExam() {
-            const name = document.getElementById('studentName').value.trim();
+            const name = document.getElementById('playerName').value.trim();
             const code = document.getElementById('examCode').value.trim();
-            
+
             if (!name || name.length < 2) {
-                alert('Введите имя!');
+                alert('👤 Введи имя (минимум 2 буквы)');
                 return;
             }
-            
+
             if (!code || code.length !== 6) {
-                alert('Введите 6-значный код!');
+                alert('🔢 Введи 6-значный код');
                 return;
             }
-            
-            studentName = name;
+
+            playerName = name;
             currentExamId = `exam_${code}`;
+
+            // Показываем ожидание
+            document.getElementById('displayName').textContent = name;
+            document.getElementById('displayCode').textContent = code;
             
+            lobbyScreen.classList.add('hidden');
+            waitingScreen.classList.remove('hidden');
+
             // Проверяем существование теста
-            db.ref(`exams/${currentExamId}`).once('value').then(snapshot => {
+            db.ref(`exams/${currentExamId}`).once('value', (snapshot) => {
                 const exam = snapshot.val();
                 if (!exam) {
-                    alert('Тест не найден!');
+                    alert('❌ Тест не найден! Проверь код');
+                    lobbyScreen.classList.remove('hidden');
+                    waitingScreen.classList.add('hidden');
                     return;
                 }
-                
-                // Регистрируем ученика
-                studentData = {
+
+                // Регистрируем игрока
+                const playerData = {
                     name: name,
                     joinedAt: Date.now(),
                     score: 0,
                     progress: 0,
                     currentTask: 1,
-                    completedTasks: [],
-                    actions: []
+                    completedTasks: []
                 };
+
+                db.ref(`exams/${currentExamId}/players/${name}`).set(playerData);
                 
-                db.ref(`exams/${currentExamId}/students/${name}`).set(studentData);
-                
-                // Переключаемся на ожидание
-                document.getElementById('joinScreen').style.display = 'none';
-                document.getElementById('waitingScreen').style.display = 'block';
-                
-                // Слушаем изменения теста
+                // Слушаем изменения
                 listenToExam();
             });
         }
-        
+
         // ===== СЛУШАЕМ ТЕСТ =====
         function listenToExam() {
-            db.ref(`exams/${currentExamId}`).on('value', snapshot => {
+            db.ref(`exams/${currentExamId}`).on('value', (snapshot) => {
                 const exam = snapshot.val();
                 if (!exam) return;
-                
-                // Обновляем список участников
-                updateParticipantsList(exam.students);
-                
-                // Если тест начался - переходим к заданиям
+
+                // Обновляем список игроков
+                updatePlayersList(exam.players);
+
+                // Если тест начался
                 if (exam.status === 'active' && !examStartTime) {
                     examStartTime = exam.startTime;
                     startExam();
                 }
-                
-                // Обновляем таймер
-                if (examStartTime) {
-                    updateGlobalTimer(exam);
+
+                // Обновляем таймер если тест активен
+                if (exam.status === 'active' && examStartTime) {
+                    updateTimer(exam.timeLimit, exam.startTime);
+                }
+
+                // Если тест закончен
+                if (exam.status === 'finished') {
+                    showLeaderboard();
                 }
             });
         }
-        
+
+        // ===== ОБНОВЛЕНИЕ СПИСКА ИГРОКОВ =====
+        function updatePlayersList(players) {
+            const list = document.getElementById('playersList');
+            const count = document.getElementById('playerCount');
+            
+            if (!players) {
+                list.innerHTML = '<span class="player-badge">👤 Ожидание...</span>';
+                count.textContent = '0';
+                return;
+            }
+
+            const playerArray = Object.keys(players);
+            count.textContent = playerArray.length;
+
+            list.innerHTML = playerArray.map(name => `
+                <span class="player-badge">
+                    👤 ${name}
+                </span>
+            `).join('');
+        }
+
         // ===== НАЧАЛО ТЕСТА =====
         function startExam() {
-            document.getElementById('waitingScreen').style.display = 'none';
-            document.getElementById('taskScreen').style.display = 'block';
-            
-            // Загружаем первое задание
-            loadTask(0);
+            waitingScreen.classList.add('hidden');
+            taskScreen.classList.remove('hidden');
             
             // Запускаем таймер
-            setInterval(() => {
-                if (examStartTime) {
-                    const elapsed = Math.floor((Date.now() - examStartTime) / 1000);
-                    const remaining = Math.max(0, EXAM_DATA.timeLimit - elapsed);
-                    
-                    const mins = Math.floor(remaining / 60);
-                    const secs = remaining % 60;
-                    document.getElementById('taskTimer').textContent = 
-                        `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
-                    
-                    // Если время вышло - показываем результаты
-                    if (remaining <= 0) {
-                        showResults();
-                    }
+            if (timerInterval) clearInterval(timerInterval);
+            
+            // Загружаем первое задание
+            currentTaskIndex = 0;
+            loadTask(0);
+        }
+
+        // ===== ТАЙМЕР =====
+        function updateTimer(timeLimit, startTime) {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const remaining = Math.max(0, timeLimit - elapsed);
+                
+                const mins = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                document.getElementById('taskTimer').textContent = 
+                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    showLeaderboard();
                 }
             }, 1000);
         }
-        
+
         // ===== ЗАГРУЗКА ЗАДАНИЯ =====
         function loadTask(index) {
             const task = EXAM_DATA.tasks[index];
             if (!task) return;
-            
-            currentTaskIndex = index;
-            document.getElementById('currentTaskNum').textContent = `${index + 1}/${EXAM_DATA.totalTasks}`;
+
+            document.getElementById('taskCounter').textContent = `${index + 1}/${EXAM_DATA.totalTasks}`;
             
             const container = document.getElementById('taskContent');
+            selectedOption = null;
             
             switch(task.type) {
-                case 'choose_wrong':
-                case 'single_choice':
+                case 'formula':
+                case 'prism':
+                case 'hard':
                     loadChoiceTask(task, container);
                     break;
                     
-                case 'memory_match':
-                    loadMemoryTask(task, container);
+                case 'calculation':
+                case 'angle_calc':
+                case 'critical':
+                    loadCalculationTask(task, container);
                     break;
                     
-                case 'slider_angles':
-                    loadSliderTask(task, container);
+                case 'flip_cards':
+                    loadFlipCardsTask(task, container);
                     break;
                     
-                case 'drawing':
-                    loadDrawingTask(task, container);
-                    break;
-                    
-                case 'angle_calculator':
-                    loadCalculatorTask(task, container);
-                    break;
-                    
-                case 'critical_angle':
-                    loadCriticalAngleTask(task, container);
-                    break;
-                    
-                case 'sort_colors':
-                    loadSortColorsTask(task, container);
-                    break;
-                    
-                case 'secret_code':
-                    loadSecretCodeTask(task, container);
+                case 'laser':
+                    loadLaserTask(task, container);
                     break;
                     
                 default:
-                    loadDefaultTask(task, container);
+                    loadChoiceTask(task, container);
             }
         }
-        
-        // ===== ЗАДАНИЕ: Выбор ответа =====
+
+        // ===== ЗАДАНИЕ С ВЫБОРОМ ОТВЕТА =====
         function loadChoiceTask(task, container) {
             let html = `
                 <div class="task-title">${task.title}</div>
                 <div class="task-description">${task.description}</div>
-                <div class="option-grid">
+                ${task.image ? `<div style="font-size: 4rem; text-align: center; margin: 20px 0;">${task.image}</div>` : ''}
+                <div class="options-grid">
             `;
             
             task.options.forEach((option, i) => {
                 html += `
                     <div class="option-btn" onclick="selectOption(this, ${i})">
+                        <span class="option-prefix">${String.fromCharCode(65 + i)}</span>
                         ${option.text}
                     </div>
                 `;
@@ -507,22 +775,52 @@
             html += `</div>`;
             container.innerHTML = html;
         }
-        
-        // ===== ЗАДАНИЕ: Найди пару (мемори) =====
-        function loadMemoryTask(task, container) {
+
+        // ===== ЗАДАНИЕ С ЧИСЛОВЫМ ОТВЕТОМ =====
+        function loadCalculationTask(task, container) {
             let html = `
                 <div class="task-title">${task.title}</div>
                 <div class="task-description">${task.description}</div>
-                <div class="memory-grid" id="memoryGrid">
+                ${task.image ? `<div style="font-size: 4rem; text-align: center; margin: 20px 0;">${task.image}</div>` : ''}
+                ${task.formula ? `<div style="background: rgba(139, 92, 246, 0.1); padding: 15px; border-radius: 20px; margin: 20px 0; font-family: monospace; font-size: 1.2rem;">${task.formula}</div>` : ''}
+                <input type="number" id="numberAnswer" class="number-input" placeholder="Введи число" step="0.1">
+            `;
+            container.innerHTML = html;
+        }
+
+        // ===== ПЕРЕВЕРТЫШИ (ИСПРАВЛЕННЫЕ) =====
+        function loadFlipCardsTask(task, container) {
+            // Создаем перемешанный массив карточек
+            let cards = [];
+            task.pairs.forEach((pair, index) => {
+                cards.push({
+                    id: `term_${index}`,
+                    pairId: index,
+                    text: pair.term,
+                    type: 'term'
+                });
+                cards.push({
+                    id: `def_${index}`,
+                    pairId: index,
+                    text: pair.definition,
+                    type: 'def'
+                });
+            });
+            
+            // Перемешиваем
+            cards = cards.sort(() => Math.random() - 0.5);
+            
+            let html = `
+                <div class="task-title">${task.title}</div>
+                <div class="task-description">${task.description}</div>
+                <div class="flip-grid" id="flipGrid">
             `;
             
-            // Перемешиваем карточки
-            const shuffled = [...task.cards].sort(() => Math.random() - 0.5);
-            
-            shuffled.forEach(card => {
+            cards.forEach((card, index) => {
                 html += `
-                    <div class="memory-card" data-id="${card.id}" data-pair="${card.pairId}" onclick="flipCard(this)">
-                        ❓
+                    <div class="flip-card" data-id="${card.id}" data-pair="${card.pairId}" data-type="${card.type}" data-index="${index}" onclick="flipCard(this)">
+                        <div class="front">❓</div>
+                        <div class="back">${card.text}</div>
                     </div>
                 `;
             });
@@ -530,229 +828,261 @@
             html += `</div>`;
             container.innerHTML = html;
             
-            // Сохраняем данные карточек
-            window.memoryCards = task.cards;
-            window.selectedCard = null;
-            window.matchedPairs = 0;
+            // Сброс состояния
+            flippedCards = [];
+            matchedPairs = 0;
         }
-        
-        // ===== ЗАДАНИЕ: Слайдер углов =====
-        function loadSliderTask(task, container) {
-            container.innerHTML = `
-                <div class="task-title">${task.title}</div>
-                <div class="task-description">${task.description}</div>
-                
-                <div class="slider-container">
-                    <div class="slider-label">
-                        <span>Угол падения: <span id="angleValue">${task.params.startAngle}°</span></span>
-                        <span>Цель: ${task.params.targetAngle}°</span>
-                    </div>
-                    <input type="range" min="0" max="90" value="${task.params.startAngle}" 
-                           step="1" oninput="updateAngle(this.value)">
-                </div>
-                
-                <canvas id="rayCanvas" width="400" height="200" style="width:100%; height:auto;"></canvas>
-            `;
-            
-            drawRay(task.params.startAngle, task.params.n1, task.params.n2);
-        }
-        
-        // ===== Рисование луча =====
-        function drawRay(angle, n1, n2) {
-            const canvas = document.getElementById('rayCanvas');
-            if (!canvas) return;
-            
-            const ctx = canvas.getContext('2d');
-            const w = canvas.width;
-            const h = canvas.height;
-            
-            ctx.clearRect(0, 0, w, h);
-            
-            // Рисуем границу раздела сред
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(0, h/2);
-            ctx.lineTo(w, h/2);
-            ctx.stroke();
-            
-            // Рисуем луч
-            const rad = angle * Math.PI / 180;
-            const refractedRad = Math.asin(Math.sin(rad) * n1 / n2);
-            
-            ctx.strokeStyle = '#4facfe';
-            ctx.lineWidth = 3;
-            
-            // Падающий луч
-            ctx.beginPath();
-            ctx.moveTo(100, h/2);
-            ctx.lineTo(100 - 80 * Math.sin(rad), h/2 - 80 * Math.cos(rad));
-            ctx.stroke();
-            
-            // Преломленный луч
-            ctx.strokeStyle = '#43e97b';
-            ctx.beginPath();
-            ctx.moveTo(100, h/2);
-            ctx.lineTo(100 + 80 * Math.sin(refractedRad), h/2 + 80 * Math.cos(refractedRad));
-            ctx.stroke();
-        }
-        
-        // ===== Обновление угла =====
-        function updateAngle(value) {
-            document.getElementById('angleValue').textContent = value + '°';
-            drawRay(value, 1.0, 1.33);
-        }
-        
-        // ===== Переворот карточки =====
+
+        // ===== ПЕРЕВОРОТ КАРТОЧКИ (ИСПРАВЛЕННЫЙ) =====
         function flipCard(card) {
-            if (card.classList.contains('matched')) return;
-            
-            const cardData = window.memoryCards.find(c => c.id === card.dataset.id);
-            
-            if (window.selectedCard === null) {
-                // Первая карточка
-                window.selectedCard = card;
-                card.classList.add('flipped');
-                card.textContent = cardData.text;
-            } else if (window.selectedCard === card) {
-                // Та же карточка - ничего не делаем
+            // Если карточка уже сопоставлена или открыта - игнорируем
+            if (card.classList.contains('matched') || card.classList.contains('flipped')) {
                 return;
-            } else {
-                // Вторая карточка
-                card.classList.add('flipped');
-                card.textContent = cardData.text;
+            }
+            
+            // Открываем карточку
+            card.classList.add('flipped');
+            flippedCards.push(card);
+            
+            // Если открыто 2 карточки - проверяем пару
+            if (flippedCards.length === 2) {
+                const card1 = flippedCards[0];
+                const card2 = flippedCards[1];
                 
-                // Проверяем пару
-                if (card.dataset.pair === window.selectedCard.dataset.id) {
+                // Проверяем, образуют ли они пару
+                if (card1.dataset.pair === card2.dataset.pair) {
                     // Правильно!
                     setTimeout(() => {
-                        card.classList.add('matched');
-                        window.selectedCard.classList.add('matched');
-                        window.selectedCard = null;
-                        window.matchedPairs++;
+                        card1.classList.add('matched');
+                        card2.classList.add('matched');
+                        flippedCards = [];
+                        matchedPairs++;
                         
-                        if (window.matchedPairs === 4) {
+                        // Если все пары найдены
+                        if (matchedPairs === 4) { // 4 пары в задании
                             document.getElementById('submitBtn').click();
                         }
                     }, 500);
                 } else {
-                    // Неправильно
+                    // Неправильно - закрываем через секунду
                     setTimeout(() => {
-                        card.classList.remove('flipped');
-                        window.selectedCard.classList.remove('flipped');
-                        card.textContent = '❓';
-                        window.selectedCard.textContent = '❓';
-                        window.selectedCard = null;
-                    }, 700);
+                        card1.classList.remove('flipped');
+                        card2.classList.remove('flipped');
+                        flippedCards = [];
+                    }, 800);
                 }
             }
         }
-        
-        // ===== Выбор варианта =====
+
+        // ===== ЛАЗЕР (интерактив) =====
+        function loadLaserTask(task, container) {
+            container.innerHTML = `
+                <div class="task-title">${task.title}</div>
+                <div class="task-description">${task.description}</div>
+                <canvas id="laserCanvas" class="laser-canvas"></canvas>
+                <div style="text-align: center; color: #94a3b8;">
+                    👆 Тащи луч пальцем
+                </div>
+            `;
+            
+            setTimeout(() => initLaser(task.params), 100);
+        }
+
+        // ===== ИНИЦИАЛИЗАЦИЯ ЛАЗЕРА =====
+        function initLaser(params) {
+            const canvas = document.getElementById('laserCanvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width = canvas.offsetWidth;
+            const h = canvas.height = canvas.offsetHeight;
+            
+            let mouseX = w / 2;
+            
+            function draw() {
+                ctx.clearRect(0, 0, w, h);
+                
+                // Рисуем границу вода-воздух
+                ctx.beginPath();
+                ctx.strokeStyle = '#a78bfa';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([10, 10]);
+                ctx.moveTo(0, h/2);
+                ctx.lineTo(w, h/2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Рисуем рыбку
+                ctx.font = '30px Arial';
+                ctx.fillStyle = '#fbbf24';
+                ctx.fillText('🐟', params.fishX * w / 100, params.fishY * h / 100);
+                
+                // Рисуем лазер
+                const angle = ((mouseX / w) * 90) * Math.PI / 180;
+                
+                ctx.beginPath();
+                ctx.strokeStyle = '#ef4444';
+                ctx.lineWidth = 3;
+                ctx.moveTo(50, h/2);
+                
+                // Преломление
+                const sinAlpha = Math.sin(angle);
+                const sinBeta = sinAlpha * params.n1 / params.n2;
+                
+                if (sinBeta <= 1) {
+                    const beta = Math.asin(sinBeta);
+                    ctx.lineTo(50 + 100 * Math.cos(angle), h/2 - 50 * Math.sin(angle));
+                    ctx.strokeStyle = '#ef4444';
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#4ade80';
+                    ctx.moveTo(50 + 100 * Math.cos(angle), h/2 - 50 * Math.sin(angle));
+                    ctx.lineTo(50 + 100 * Math.cos(angle) + 150 * Math.cos(beta), h/2 - 50 * Math.sin(angle) + 150 * Math.sin(beta));
+                    ctx.stroke();
+                } else {
+                    // Полное отражение
+                    ctx.lineTo(50 + 150 * Math.cos(angle), h/2 - 150 * Math.sin(angle));
+                    ctx.stroke();
+                }
+            }
+            
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                mouseX = e.touches[0].clientX - rect.left;
+                draw();
+            });
+            
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = e.clientX - rect.left;
+                draw();
+            });
+            
+            draw();
+        }
+
+        // ===== ВЫБОР ОПЦИИ =====
         function selectOption(element, index) {
             document.querySelectorAll('.option-btn').forEach(btn => {
                 btn.classList.remove('selected');
             });
             element.classList.add('selected');
-            window.selectedOption = index;
+            selectedOption = index;
         }
-        
-        // ===== Отправка ответа =====
+
+        // ===== ОТПРАВКА ОТВЕТА =====
         function submitAnswer() {
             const task = EXAM_DATA.tasks[currentTaskIndex];
+            let isCorrect = false;
             
-            // Сохраняем действие
-            const action = {
-                time: new Date().toLocaleTimeString(),
-                task: currentTaskIndex + 1,
-                description: `Ответил на задание ${currentTaskIndex + 1}`
-            };
-            
-            // Обновляем прогресс
-            studentData.progress = Math.round(((currentTaskIndex + 1) / EXAM_DATA.totalTasks) * 100);
-            studentData.score = (studentData.score || 0) + task.points;
-            studentData.currentTask = currentTaskIndex + 2;
-            
-            // Сохраняем в Firebase
-            db.ref(`exams/${currentExamId}/students/${studentName}`).update({
-                progress: studentData.progress,
-                score: studentData.score,
-                currentTask: studentData.currentTask,
-                actions: firebase.database.ServerValue.increment(1)
-            });
-            
-            // Показываем следующее задание или результаты
-            if (currentTaskIndex + 1 >= EXAM_DATA.totalTasks) {
-                showResults();
+            // Проверка ответа в зависимости от типа задания
+            if (task.type === 'flip_cards') {
+                // Для перевертышей проверяем, все ли пары найдены
+                isCorrect = (matchedPairs === 4);
+            } else if (task.type === 'calculation' || task.type === 'angle_calc' || task.type === 'critical') {
+                // Для числовых ответов
+                const answer = parseFloat(document.getElementById('numberAnswer')?.value);
+                isCorrect = Math.abs(answer - task.correctAnswer) < 0.1;
             } else {
-                document.getElementById('submitBtn').style.display = 'none';
-                document.getElementById('nextBtn').style.display = 'block';
+                // Для выбора ответа
+                if (selectedOption === undefined) {
+                    alert('Выбери ответ!');
+                    return;
+                }
+                isCorrect = task.options[selectedOption].correct;
+            }
+            
+            if (isCorrect) {
+                playerScore += task.points;
                 
-                // Анимация
-                document.getElementById('taskContent').classList.add('correct-flash');
-                setTimeout(() => {
-                    document.getElementById('taskContent').classList.remove('correct-flash');
-                }, 500);
+                // Сохраняем результат
+                db.ref(`exams/${currentExamId}/players/${playerName}`).update({
+                    score: playerScore,
+                    progress: Math.round(((currentTaskIndex + 1) / EXAM_DATA.totalTasks) * 100),
+                    currentTask: currentTaskIndex + 2
+                });
+                
+                // Показываем следующее задание или результаты
+                if (currentTaskIndex + 1 >= EXAM_DATA.totalTasks) {
+                    showLeaderboard();
+                } else {
+                    submitBtn.style.display = 'none';
+                    nextBtn.style.display = 'block';
+                }
+            } else {
+                alert('❌ Неправильно! Попробуй еще раз');
             }
         }
-        
-        // ===== Следующее задание =====
+
+        // ===== СЛЕДУЮЩЕЕ ЗАДАНИЕ =====
         function nextTask() {
-            document.getElementById('submitBtn').style.display = 'block';
-            document.getElementById('nextBtn').style.display = 'none';
-            loadTask(currentTaskIndex + 1);
+            submitBtn.style.display = 'block';
+            nextBtn.style.display = 'none';
+            currentTaskIndex++;
+            loadTask(currentTaskIndex);
         }
-        
-        // ===== Показать результаты =====
-        function showResults() {
-            document.getElementById('taskScreen').style.display = 'none';
-            document.getElementById('resultScreen').style.display = 'block';
+
+        // ===== ПОКАЗАТЬ ЛИДЕРБОРД =====
+        function showLeaderboard() {
+            clearInterval(timerInterval);
             
-            // Получаем финальный лидерборд
-            db.ref(`exams/${currentExamId}/students`).once('value', snapshot => {
-                const students = snapshot.val() || {};
-                const sorted = Object.entries(students)
-                    .sort((a, b) => (b[1].score || 0) - (a[1].score || 0));
+            taskScreen.classList.add('hidden');
+            leaderboardScreen.classList.remove('hidden');
+            
+            // Получаем всех игроков
+            db.ref(`exams/${currentExamId}/players`).once('value', (snapshot) => {
+                const players = snapshot.val() || {};
+                const sorted = Object.entries(players)
+                    .sort((a, b) => b[1].score - a[1].score);
                 
+                // Находим место игрока
                 let rank = 1;
                 for (let [name, data] of sorted) {
-                    if (name === studentName) break;
+                    if (name === playerName) break;
                     rank++;
                 }
                 
-                document.getElementById('finalScore').textContent = `${studentData.score} очков`;
-                document.getElementById('finalRank').textContent = `Место: ${rank} из ${sorted.length}`;
+                document.getElementById('finalScore').textContent = `${playerScore} ⭐`;
+                document.getElementById('finalRank').textContent = `Твоё место: ${rank} из ${sorted.length}`;
                 
-                // Показываем лидерборд
-                document.getElementById('finalLeaderboard').innerHTML = `
-                    <h4>🏆 ЛИДЕРЫ</h4>
-                    ${sorted.slice(0, 5).map(([name, data], i) => `
-                        <div class="leaderboard-item">
+                // Показываем топ-5
+                const leaderboardList = document.getElementById('leaderboardList');
+                leaderboardList.innerHTML = '<h3 style="margin-bottom: 15px;">🏆 ЛИДЕРЫ</h3>';
+                
+                sorted.slice(0, 5).forEach(([name, data], i) => {
+                    leaderboardList.innerHTML += `
+                        <div class="rank-item">
                             <span class="rank-${i+1}">${i+1}. ${name}</span>
                             <span>${data.score} ⭐</span>
                         </div>
-                    `).join('')}
-                `;
+                    `;
+                });
             });
         }
-        
-        // ===== Обновление списка участников =====
-        function updateParticipantsList(students) {
-            const list = document.getElementById('participantsList');
-            if (!list) return;
-            
-            list.innerHTML = Object.keys(students || {}).map(name => `
-                <div class="leaderboard-item">
-                    <span>👤 ${name}</span>
-                    <span>⏳</span>
-                </div>
-            `).join('');
-        }
-        
-        // ===== Выход =====
+
+        // ===== ВЫХОД =====
         function exitExam() {
             location.reload();
         }
+
+        // ===== АВТОМАТИЧЕСКИЙ ФОКУС НА КОД =====
+        document.getElementById('examCode').addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').substring(0, 6);
+        });
+        
+        document.getElementById('playerName').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('examCode').focus();
+            }
+        });
+        
+        document.getElementById('examCode').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                joinExam();
+            }
+        });
     </script>
 </body>
 </html>
