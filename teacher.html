@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>👨‍🏫 учитель · преломление</title>
+    
+    <!-- Firebase SDK (ВАЖНО: ПОДКЛЮЧАЕМ ДО ВСЕГО) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Наш конфиг -->
+    <script src="firebase-config.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -19,7 +27,6 @@
             position: relative;
         }
 
-        /* Солнце */
         .sun {
             position: fixed;
             top: 5%;
@@ -233,14 +240,27 @@
         </div>
     </div>
 
-    <script src="firebase-config.js"></script>
     <script>
+        // ============================================
+        // teacher.js
+        // ============================================
+
         let currentGameId = null;
         let gameStartTime = null;
         let timerInterval = null;
 
+        // Проверяем, что Firebase загружен
+        if (typeof db === 'undefined') {
+            console.error('❌ Firebase не загружен!');
+        }
+
         // ===== СОЗДАТЬ ИГРУ =====
         function createGame() {
+            if (typeof db === 'undefined') {
+                alert('❌ Ошибка: Firebase не загружен! Обнови страницу.');
+                return;
+            }
+
             const code = Math.floor(100000 + Math.random() * 900000).toString();
             currentGameId = `game_${code}`;
 
@@ -259,6 +279,9 @@
                 document.getElementById('gameCode').textContent = code;
 
                 listenToGame();
+            }).catch(error => {
+                console.error('❌ Ошибка создания игры:', error);
+                alert('Ошибка создания игры: ' + error.message);
             });
         }
 
