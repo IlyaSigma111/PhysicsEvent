@@ -3,15 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🌅 ученик · преломление</title>
-    
-    <!-- Firebase SDK (ВАЖНО: ПОДКЛЮЧАЕМ ДО ВСЕГО) -->
+    <title>🌅 ученик · интерактив</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    
-    <!-- Наш конфиг -->
     <script src="firebase-config.js"></script>
-    
     <style>
         * {
             margin: 0;
@@ -21,184 +16,88 @@
         }
 
         body {
-            background: linear-gradient(145deg, #2b1b0e, #8b4f1c);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(145deg, #1a0f05, #8b4513);
+            font-family: system-ui, -apple-system, sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 12px;
-            position: relative;
+            padding: 10px;
         }
 
-        /* Солнце */
-        .sun {
-            position: fixed;
-            top: 5%;
-            right: 5%;
-            width: 150px;
-            height: 150px;
-            background: radial-gradient(circle, #ffb347, #ff8c42, transparent);
-            border-radius: 50%;
-            filter: blur(30px);
-            opacity: 0.5;
-            animation: sunMove 6s infinite alternate;
-            pointer-events: none;
-        }
-
-        @keyframes sunMove {
-            from { transform: scale(1); opacity: 0.4; }
-            to { transform: scale(1.2); opacity: 0.7; }
-        }
-
-        .container {
+        .phone {
             width: 100%;
             max-width: 400px;
-            background: rgba(30, 20, 10, 0.85);
+            background: rgba(20, 12, 5, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 40px;
-            padding: 24px 20px;
-            border: 1px solid rgba(255, 180, 80, 0.3);
-            position: relative;
-            z-index: 10;
+            padding: 20px;
+            border: 2px solid #b45f1b;
         }
 
-        /* Экран */
-        .screen {
-            display: none;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        /* Лобби */
+        /* ЛОББИ */
         .lobby {
             text-align: center;
         }
 
-        .sun-icon {
-            font-size: 70px;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 0 20px orange);
+        .sun {
+            font-size: 80px;
+            margin: 20px 0;
+            filter: drop-shadow(0 0 30px #ff9900);
             animation: float 3s infinite alternate;
         }
 
         @keyframes float {
             from { transform: translateY(0); }
-            to { transform: translateY(-8px); }
+            to { transform: translateY(-10px); }
         }
 
         h1 {
             color: #ffd89c;
-            font-size: 2rem;
-            margin-bottom: 5px;
-            font-weight: 400;
-        }
-
-        .sub {
-            color: #e5b87b;
             margin-bottom: 30px;
         }
 
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .input-label {
-            color: #ffd89c;
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-        }
-
-        .input-field {
+        input {
             width: 100%;
-            padding: 16px 18px;
-            background: rgba(0, 0, 0, 0.3);
+            padding: 18px;
+            margin: 10px 0;
+            background: #1a0f05;
             border: 2px solid #b45f1b;
             border-radius: 30px;
             color: white;
             font-size: 1.2rem;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: #ffb45b;
-        }
-
-        .code-field {
-            font-family: monospace;
-            font-size: 2rem;
-            letter-spacing: 8px;
             text-align: center;
         }
 
-        .btn {
+        button {
             width: 100%;
             padding: 18px;
-            background: linear-gradient(45deg, #b45f1b, #7b3f0e);
+            background: #b45f1b;
             border: none;
             border-radius: 30px;
             color: white;
             font-size: 1.2rem;
-            font-weight: 600;
+            font-weight: bold;
+            margin: 10px 0;
             cursor: pointer;
-            margin-top: 10px;
-            border: 1px solid #ffb45b;
+            transition: transform 0.1s;
         }
 
-        .btn:active {
-            transform: scale(0.97);
+        button:active {
+            transform: scale(0.95);
         }
 
-        /* Ожидание */
-        .waiting-header {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 30px;
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 20px;
+        .hidden {
+            display: none;
         }
 
-        .game-code {
-            font-size: 3rem;
-            font-family: monospace;
-            color: #ffd966;
-            letter-spacing: 10px;
-            margin: 15px 0;
-        }
-
-        .players-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin: 20px 0;
-        }
-
-        .player-badge {
-            background: rgba(180, 100, 30, 0.4);
-            border: 1px solid #b45f1b;
-            border-radius: 30px;
-            padding: 8px 16px;
-            color: #ffd9a5;
-        }
-
-        /* Игра */
-        .game-header {
+        /* ИГРА */
+        .header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .progress {
-            background: rgba(0,0,0,0.3);
-            border-radius: 20px;
-            padding: 8px 16px;
             color: #ffd89c;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
         }
 
         .timer {
@@ -207,454 +106,503 @@
             color: #ffd966;
         }
 
-        .tasks-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .task-cell {
-            aspect-ratio: 1;
-            background: rgba(100, 60, 20, 0.6);
+        .task {
+            background: #1a0f05;
             border: 2px solid #b45f1b;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: #ffd89c;
-            cursor: pointer;
-        }
-
-        .task-cell.completed {
-            background: rgba(70, 100, 30, 0.6);
-            border-color: #7cb342;
-        }
-
-        .task-cell.current {
-            border-color: #ffd966;
-            box-shadow: 0 0 15px #ffb45b;
-        }
-
-        /* Карточка задания */
-        .task-card {
-            background: rgba(0, 0, 0, 0.3);
             border-radius: 30px;
             padding: 20px;
+            margin: 15px 0;
         }
 
-        .task-title {
-            font-size: 1.3rem;
+        .task h2 {
             color: #ffd89c;
             margin-bottom: 10px;
         }
 
-        .task-desc {
+        .task p {
             color: #e5b87b;
             margin-bottom: 20px;
-            font-size: 1rem;
         }
 
-        .options {
+        /* СЛАЙДЕР */
+        .slider-container {
+            padding: 20px 0;
+        }
+
+        .slider-value {
+            font-size: 4rem;
+            color: #ffd966;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        input[type=range] {
+            width: 100%;
+            height: 15px;
+            background: #b45f1b;
+            border-radius: 15px;
+            -webkit-appearance: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 60px;
+            height: 60px;
+            background: #ffd966;
+            border-radius: 50%;
+            border: 4px solid #b45f1b;
+            box-shadow: 0 0 20px #ff9900;
+            cursor: pointer;
+        }
+
+        /* КАРТОЧКИ */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .card {
+            aspect-ratio: 1;
+            background: #b45f1b;
+            border-radius: 20px;
             display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 20px 0;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            transform-style: preserve-3d;
         }
 
-        .option {
-            padding: 16px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 2px solid #b45f1b;
+        .card.flipped {
+            background: #8b4513;
+            transform: rotateY(180deg);
+        }
+
+        .card.matched {
+            opacity: 0.3;
+            cursor: default;
+        }
+
+        /* DRAG DROP */
+        .drag-area {
+            min-height: 100px;
+            background: #2a1a0a;
+            border: 2px dashed #b45f1b;
+            border-radius: 20px;
+            margin: 15px 0;
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .drag-item {
+            padding: 15px 20px;
+            background: #b45f1b;
             border-radius: 30px;
             color: white;
-            text-align: center;
-            cursor: pointer;
+            cursor: grab;
+            font-size: 1.2rem;
         }
 
-        .option.selected {
-            background: #b45f1b;
-            border-color: #ffd966;
-        }
-
-        .back-btn {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid #b45f1b;
-            color: #ffd89c;
-            padding: 12px 20px;
+        /* РИСОВАЛКА */
+        canvas {
+            width: 100%;
+            height: 250px;
+            background: #2a1a0a;
             border-radius: 30px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            display: inline-block;
+            touch-action: none;
+            margin: 15px 0;
         }
 
-        .error {
-            color: #ff6b6b;
-            text-align: center;
-            margin-top: 10px;
+        /* ПРОГРЕСС */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #2a1a0a;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
         }
 
-        .hidden {
-            display: none;
+        .progress-fill {
+            height: 100%;
+            background: #b45f1b;
+            width: 10%;
+            transition: width 0.3s;
         }
     </style>
 </head>
 <body>
-    <div class="sun"></div>
-    
-    <div class="container">
-        <!-- Лобби -->
-        <div id="lobbyScreen" class="screen active">
-            <div class="lobby">
-                <div class="sun-icon">🌅</div>
-                <h1>преломление</h1>
-                <div class="sub">20 заданий · 20 минут</div>
+    <div class="phone">
+        <!-- ЛОББИ -->
+        <div id="lobby">
+            <div class="sun">🌅</div>
+            <h1>преломление</h1>
+            <input type="text" id="playerName" placeholder="твоё имя" maxlength="15">
+            <input type="text" id="gameCode" placeholder="код игры" maxlength="6" inputmode="numeric">
+            <button onclick="joinGame()">войти в игру</button>
+            <div id="error" style="color: #ff6b6b; margin-top: 10px;"></div>
+        </div>
 
-                <div class="input-group">
-                    <label class="input-label">твоё имя</label>
-                    <input type="text" id="playerName" class="input-field" placeholder="например, Алиса" maxlength="15">
-                </div>
-
-                <div class="input-group">
-                    <label class="input-label">код игры</label>
-                    <input type="text" id="gameCode" class="input-field code-field" placeholder="000000" maxlength="6" inputmode="numeric">
-                </div>
-
-                <button class="btn" onclick="joinGame()">войти в игру</button>
-                <div id="joinError" class="error"></div>
+        <!-- ОЖИДАНИЕ -->
+        <div id="waiting" class="hidden">
+            <div style="text-align: center;">
+                <div class="sun">⏳</div>
+                <div style="font-size: 4rem; color: #ffd966; letter-spacing: 10px;" id="displayCode">000000</div>
+                <div style="color: #ffd89c; margin: 20px;" id="playersCount">0 игроков</div>
             </div>
         </div>
 
-        <!-- Ожидание -->
-        <div id="waitingScreen" class="screen">
-            <div class="waiting-header">
-                <div style="color: #ffd89c;">ждём старта</div>
-                <div class="game-code" id="displayCode">000000</div>
-                <div id="displayName" style="color: #e5b87b;"></div>
+        <!-- ИГРА -->
+        <div id="game" class="hidden">
+            <div class="header">
+                <span id="taskCounter">задание 1/10</span>
+                <span class="timer" id="timer">20:00</span>
             </div>
 
-            <div style="color: #ffd89c; margin-bottom: 10px;">участники:</div>
-            <div id="playersList" class="players-list"></div>
-        </div>
-
-        <!-- Игра -->
-        <div id="gameScreen" class="screen">
-            <div class="game-header">
-                <div class="progress" id="progressDisplay">0/20</div>
-                <div class="timer" id="timer">20:00</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
             </div>
 
-            <div id="tasksGrid" class="tasks-grid"></div>
+            <!-- ЗАДАНИЕ 1: СЛАЙДЕР -->
+            <div id="task1" class="task">
+                <h2>🌅 поймай угол</h2>
+                <p>передвинь ползунок на 45°</p>
+                <div class="slider-container">
+                    <div class="slider-value" id="sliderValue">0°</div>
+                    <input type="range" id="slider" min="0" max="90" value="0" step="1">
+                </div>
+                <button onclick="checkTask(1)">готово</button>
+            </div>
 
-            <div id="taskCard" class="task-card hidden">
-                <div class="back-btn" onclick="closeTask()">← назад</div>
-                <div id="taskTitle" class="task-title"></div>
-                <div id="taskDesc" class="task-desc"></div>
-                <div id="taskOptions" class="options"></div>
+            <!-- ЗАДАНИЕ 2: DRAG & DROP -->
+            <div id="task2" class="task hidden">
+                <h2>🧩 собери формулу</h2>
+                <p>перетащи элементы: n₁·sinα = n₂·sinβ</p>
+                <div class="drag-area" id="dragSource">
+                    <div class="drag-item" draggable="true">n₁</div>
+                    <div class="drag-item" draggable="true">·</div>
+                    <div class="drag-item" draggable="true">sin</div>
+                    <div class="drag-item" draggable="true">α</div>
+                    <div class="drag-item" draggable="true">=</div>
+                    <div class="drag-item" draggable="true">n₂</div>
+                    <div class="drag-item" draggable="true">·</div>
+                    <div class="drag-item" draggable="true">sin</div>
+                    <div class="drag-item" draggable="true">β</div>
+                </div>
+                <div class="drag-area" id="dropZone"></div>
+                <button onclick="checkTask(2)">проверить</button>
+            </div>
+
+            <!-- ЗАДАНИЕ 3: МЕМОРИ -->
+            <div id="task3" class="task hidden">
+                <h2>🃏 найди пару</h2>
+                <p>найди все пары карточек</p>
+                <div class="cards-grid" id="memoryGrid"></div>
+            </div>
+
+            <!-- ЗАДАНИЕ 4: РИСОВАЛКА -->
+            <div id="task4" class="task hidden">
+                <h2>✏️ нарисуй луч</h2>
+                <p>нарисуй пальцем, как идёт луч</p>
+                <canvas id="drawCanvas"></canvas>
+                <button onclick="clearCanvas()">очистить</button>
+                <button onclick="checkTask(4)">готово</button>
+            </div>
+
+            <!-- ЗАДАНИЕ 5: КРУТИЛКА -->
+            <div id="task5" class="task hidden">
+                <h2>↻ поймай угол</h2>
+                <p>поверни диск на 60°</p>
+                <div class="slider-container">
+                    <div class="slider-value" id="dialValue">0°</div>
+                    <input type="range" id="dial" min="0" max="360" value="0">
+                </div>
+                <button onclick="checkTask(5)">готово</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ============================================
-        // student.js
-        // ============================================
-
-        // Проверяем Firebase
-        if (typeof db === 'undefined') {
-            console.error('❌ Firebase не загружен!');
-        }
-
-        const TASKS = [
-            { // 1
-                title: "🌅 угол заката",
-                desc: "под каким углом солнце садится за горизонт?",
-                options: ["30°", "45°", "60°", "90°"],
-                correct: 3
-            },
-            { // 2
-                title: "💧 скорость света",
-                desc: "в какой среде скорость света наименьшая?",
-                options: ["воздух", "вода", "стекло", "вакуум"],
-                correct: 2
-            },
-            { // 3
-                title: "📐 закон преломления",
-                desc: "выбери правильную формулу",
-                options: ["n₁·sinα = n₂·sinβ", "n₁·sinβ = n₂·sinα", "sinα/n₁ = sinβ/n₂"],
-                correct: 0
-            },
-            { // 4
-                title: "⚡ углы",
-                desc: "при переходе из воздуха в воду угол преломления ...",
-                options: ["больше угла падения", "меньше угла падения", "равен"],
-                correct: 1
-            },
-            { // 5
-                title: "🌈 радуга",
-                desc: "какой цвет преломляется сильнее всего?",
-                options: ["красный", "зелёный", "синий", "фиолетовый"],
-                correct: 3
-            },
-            { // 6
-                title: "🔍 полное отражение",
-                desc: "при каком условии возможно полное отражение?",
-                options: ["из воды в воздух", "из воздуха в воду", "всегда", "никогда"],
-                correct: 0
-            },
-            { // 7
-                title: "🧮 показатель",
-                desc: "n = 300000 / 200000 = ?",
-                options: ["0.5", "1", "1.5", "2"],
-                correct: 2
-            },
-            { // 8
-                title: "🐟 рыбка",
-                desc: "рыба в воде кажется ...",
-                options: ["ближе", "дальше", "такой же"],
-                correct: 0
-            },
-            { // 9
-                title: "🔺 призма",
-                desc: "луч в призме отклоняется к ...",
-                options: ["основанию", "вершине", "стенке"],
-                correct: 0
-            },
-            { // 10
-                title: "🌅 закат",
-                desc: "почему небо на закате красное?",
-                options: ["красный меньше рассеивается", "солнце остывает", "воздух краснеет"],
-                correct: 0
-            },
-            { // 11
-                title: "📏 углы",
-                desc: "угол падения = углу ...",
-                options: ["преломления", "отражения", "падения"],
-                correct: 1
-            },
-            { // 12
-                title: "💎 алмаз",
-                desc: "показатель преломления алмаза примерно",
-                options: ["1.3", "1.5", "2.4", "3.5"],
-                correct: 2
-            },
-            { // 13
-                title: "🌊 вода",
-                desc: "показатель преломления воды",
-                options: ["1", "1.33", "1.5", "2"],
-                correct: 1
-            },
-            { // 14
-                title: "🔬 линза",
-                desc: "собирающая линза ... лучи",
-                options: ["собирает", "рассеивает", "не меняет"],
-                correct: 0
-            },
-            { // 15
-                title: "🔄 лучи",
-                desc: "ход лучей обратим?",
-                options: ["да", "нет", "иногда"],
-                correct: 0
-            },
-            { // 16
-                title: "📐 синус",
-                desc: "sin30° = ?",
-                options: ["0", "0.5", "1", "1.5"],
-                correct: 1
-            },
-            { // 17
-                title: "🔭 телескоп",
-                desc: "телескоп нужен чтобы ...",
-                options: ["увеличить", "приблизить", "увидеть далёкое"],
-                correct: 2
-            },
-            { // 18
-                title: "⚡ скорость",
-                desc: "самая большая скорость у ...",
-                options: ["красного", "фиолетового", "одинаковая"],
-                correct: 0
-            },
-            { // 19
-                title: "💡 свет",
-                desc: "свет — это ...",
-                options: ["волна", "частица", "и то и другое"],
-                correct: 2
-            },
-            { // 20
-                title: "🏆 финал",
-                desc: "что происходит с частотой при преломлении?",
-                options: ["меняется", "не меняется", "исчезает"],
-                correct: 1
-            }
-        ];
-
-        // Состояние
         let currentGameId = null;
         let playerName = null;
-        let answers = {};
-        let currentTask = null;
-
-        // DOM
-        const lobbyScreen = document.getElementById('lobbyScreen');
-        const waitingScreen = document.getElementById('waitingScreen');
-        const gameScreen = document.getElementById('gameScreen');
-        const taskCard = document.getElementById('taskCard');
-        const tasksGrid = document.getElementById('tasksGrid');
+        let currentTask = 1;
+        let gameStartTime = null;
 
         // ===== ВХОД =====
         function joinGame() {
-            if (typeof db === 'undefined') {
-                document.getElementById('joinError').textContent = '❌ Ошибка подключения';
-                return;
-            }
-
             const name = document.getElementById('playerName').value.trim();
             const code = document.getElementById('gameCode').value.trim();
 
-            if (!name || name.length < 2) {
-                document.getElementById('joinError').textContent = '❌ введи имя';
-                return;
-            }
-
-            if (!code || code.length !== 6) {
-                document.getElementById('joinError').textContent = '❌ нужен 6-значный код';
-                return;
-            }
+            if (!name) return showError('введи имя');
+            if (!code || code.length !== 6) return showError('нужен 6-значный код');
 
             playerName = name;
             currentGameId = `game_${code}`;
 
-            document.getElementById('displayName').textContent = name;
             document.getElementById('displayCode').textContent = code;
+            document.getElementById('lobby').classList.add('hidden');
+            document.getElementById('waiting').classList.remove('hidden');
 
-            lobbyScreen.classList.remove('active');
-            waitingScreen.classList.add('active');
-
-            // Проверяем игру
-            db.ref(`games/${currentGameId}`).once('value', (snapshot) => {
-                const game = snapshot.val();
-                if (!game) {
-                    document.getElementById('joinError').textContent = '❌ игра не найдена';
-                    lobbyScreen.classList.add('active');
-                    waitingScreen.classList.remove('active');
-                    return;
-                }
-
-                // Регистрируем игрока
-                db.ref(`games/${currentGameId}/players/${name}`).set({
-                    name: name,
-                    joinedAt: Date.now(),
-                    answers: {},
-                    progress: 0
-                });
-
-                // Слушаем игру
-                listenToGame();
-            }).catch(error => {
-                console.error('❌ Ошибка:', error);
-                document.getElementById('joinError').textContent = '❌ ошибка подключения';
+            // Регистрация
+            db.ref(`games/${currentGameId}/players/${name}`).set({
+                name: name,
+                joinedAt: Date.now(),
+                task: 1
             });
-        }
 
-        // ===== СЛУШАЕМ =====
-        function listenToGame() {
-            db.ref(`games/${currentGameId}`).on('value', (snapshot) => {
-                const game = snapshot.val();
+            // Слушаем игру
+            db.ref(`games/${currentGameId}`).on('value', (snap) => {
+                const game = snap.val();
                 if (!game) return;
 
                 // Обновляем список игроков
-                updatePlayersList(game.players);
+                if (game.players) {
+                    document.getElementById('playersCount').textContent = 
+                        Object.keys(game.players).length + ' игроков';
+                }
 
-                // Если игра началась
-                if (game.status === 'active') {
-                    waitingScreen.classList.remove('active');
-                    gameScreen.classList.add('active');
+                // Старт игры
+                if (game.status === 'active' && !gameStartTime) {
+                    gameStartTime = game.startTime;
+                    document.getElementById('waiting').classList.add('hidden');
+                    document.getElementById('game').classList.remove('hidden');
                     startGame(game);
                 }
 
-                // Обновляем таймер
+                // Таймер
                 if (game.status === 'active' && game.startTime) {
                     updateTimer(game.timeLimit, game.startTime);
                 }
             });
         }
 
-        // ===== СПИСОК ИГРОКОВ =====
-        function updatePlayersList(players) {
-            const list = document.getElementById('playersList');
-            if (!players) return;
-
-            list.innerHTML = Object.keys(players).map(name => 
-                `<span class="player-badge">👤 ${name}</span>`
-            ).join('');
-        }
-
-        // ===== СТАРТ =====
         function startGame(game) {
-            renderTasksGrid();
+            showTask(1);
         }
 
-        // ===== ТАЙМЕР =====
-        function updateTimer(limit, startTime) {
-            const elapsed = Math.floor((Date.now() - startTime) / 1000);
-            const remaining = Math.max(0, limit - elapsed);
-            const mins = Math.floor(remaining / 60);
-            const secs = remaining % 60;
-            document.getElementById('timer').textContent = 
-                `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+        function updateTimer(limit, start) {
+            setInterval(() => {
+                const elapsed = Math.floor((Date.now() - start) / 1000);
+                const remaining = Math.max(0, limit - elapsed);
+                const mins = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                document.getElementById('timer').textContent = 
+                    `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+            }, 1000);
         }
 
-        // ===== СЕТКА =====
-        function renderTasksGrid() {
-            let html = '';
-            for (let i = 0; i < TASKS.length; i++) {
-                const taskNum = i + 1;
-                const completed = answers[taskNum] !== undefined ? 'completed' : '';
-                html += `<div class="task-cell ${completed}" onclick="openTask(${i})">${taskNum}</div>`;
+        function showTask(num) {
+            // Прячем все
+            for (let i = 1; i <= 5; i++) {
+                const el = document.getElementById(`task${i}`);
+                if (el) el.classList.add('hidden');
             }
-            tasksGrid.innerHTML = html;
-
-            const completedCount = Object.keys(answers).length;
-            document.getElementById('progressDisplay').textContent = `${completedCount}/20`;
-        }
-
-        // ===== ОТКРЫТЬ ЗАДАНИЕ =====
-        function openTask(index) {
-            currentTask = index;
-            const task = TASKS[index];
-            const taskNum = index + 1;
-
-            let optionsHtml = '';
-            task.options.forEach((opt, i) => {
-                const selected = answers[taskNum] === i ? 'selected' : '';
-                optionsHtml += `<div class="option ${selected}" onclick="selectAnswer(${i})">${opt}</div>`;
-            });
-
-            document.getElementById('taskTitle').textContent = task.title;
-            document.getElementById('taskDesc').textContent = task.desc;
-            document.getElementById('taskOptions').innerHTML = optionsHtml;
-            taskCard.classList.remove('hidden');
-        }
-
-        // ===== ВЫБРАТЬ ОТВЕТ =====
-        function selectAnswer(answerIndex) {
-            const taskNum = currentTask + 1;
-            answers[taskNum] = answerIndex;
-
-            // Сохраняем в Firebase
-            db.ref(`games/${currentGameId}/players/${playerName}/answers/${taskNum}`).set(answerIndex);
             
-            const progress = Object.keys(answers).length;
-            db.ref(`games/${currentGameId}/players/${playerName}/progress`).set(progress);
+            // Показываем нужное
+            const task = document.getElementById(`task${num}`);
+            if (task) task.classList.remove('hidden');
+            
+            document.getElementById('taskCounter').textContent = `задание ${num}/10`;
+            document.getElementById('progressFill').style.width = `${num * 10}%`;
+            currentTask = num;
 
-            renderTasksGrid();
-            closeTask();
+            // Инициализация
+            if (num === 1) initSlider();
+            if (num === 2) initDragDrop();
+            if (num === 3) initMemory();
+            if (num === 4) initDraw();
+            if (num === 5) initDial();
         }
 
-        // ===== ЗАКРЫТЬ =====
-        function closeTask() {
-            taskCard.classList.add('hidden');
+        // ===== ЗАДАНИЕ 1: СЛАЙДЕР =====
+        function initSlider() {
+            const slider = document.getElementById('slider');
+            const val = document.getElementById('sliderValue');
+            slider.addEventListener('input', () => {
+                val.textContent = slider.value + '°';
+            });
+        }
+
+        // ===== ЗАДАНИЕ 2: DRAG DROP =====
+        function initDragDrop() {
+            const items = document.querySelectorAll('#dragSource .drag-item');
+            const dropZone = document.getElementById('dropZone');
+            
+            items.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text', e.target.textContent);
+                });
+            });
+            
+            dropZone.addEventListener('dragover', (e) => e.preventDefault());
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const data = e.dataTransfer.getData('text');
+                const div = document.createElement('div');
+                div.className = 'drag-item';
+                div.textContent = data;
+                dropZone.appendChild(div);
+                e.target.style.background = '#3a2a1a';
+                setTimeout(() => e.target.style.background = '', 200);
+            });
+        }
+
+        // ===== ЗАДАНИЕ 3: МЕМОРИ =====
+        function initMemory() {
+            const pairs = [
+                { term: 'преломление', def: 'изменение направления' },
+                { term: 'показатель', def: 'n = c/v' },
+                { term: 'закон', def: 'n₁sinα = n₂sinβ' },
+                { term: 'отражение', def: 'угол падения = углу отражения' }
+            ];
+
+            let cards = [];
+            pairs.forEach((p, idx) => {
+                cards.push({ text: p.term, pair: idx });
+                cards.push({ text: p.def, pair: idx });
+            });
+            
+            cards = cards.sort(() => Math.random() - 0.5);
+            
+            let html = '';
+            cards.forEach((card, i) => {
+                html += `<div class="card" data-index="${i}" data-pair="${card.pair}">❓</div>`;
+            });
+            
+            document.getElementById('memoryGrid').innerHTML = html;
+            
+            let flipped = [];
+            let matched = 0;
+            
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('click', () => {
+                    if (card.classList.contains('matched')) return;
+                    
+                    card.classList.add('flipped');
+                    card.textContent = cards[card.dataset.index].text;
+                    flipped.push(card);
+                    
+                    if (flipped.length === 2) {
+                        const [c1, c2] = flipped;
+                        if (c1.dataset.pair === c2.dataset.pair) {
+                            setTimeout(() => {
+                                c1.classList.add('matched');
+                                c2.classList.add('matched');
+                                flipped = [];
+                                matched += 2;
+                                
+                                if (matched === cards.length) {
+                                    setTimeout(() => checkTask(3), 500);
+                                }
+                            }, 500);
+                        } else {
+                            setTimeout(() => {
+                                c1.classList.remove('flipped');
+                                c2.classList.remove('flipped');
+                                c1.textContent = '❓';
+                                c2.textContent = '❓';
+                                flipped = [];
+                            }, 700);
+                        }
+                    }
+                });
+            });
+        }
+
+        // ===== ЗАДАНИЕ 4: РИСОВАЛКА =====
+        function initDraw() {
+            const canvas = document.getElementById('drawCanvas');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+            
+            canvas.addEventListener('touchstart', () => drawing = true);
+            canvas.addEventListener('touchend', () => drawing = false);
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (!drawing) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                const x = e.touches[0].clientX - rect.left;
+                const y = e.touches[0].clientY - rect.top;
+                
+                ctx.lineTo(x, y);
+                ctx.strokeStyle = '#ffd966';
+                ctx.lineWidth = 5;
+                ctx.stroke();
+            });
+        }
+
+        function clearCanvas() {
+            const canvas = document.getElementById('drawCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // ===== ЗАДАНИЕ 5: КРУТИЛКА =====
+        function initDial() {
+            const dial = document.getElementById('dial');
+            const val = document.getElementById('dialValue');
+            dial.addEventListener('input', () => {
+                val.textContent = dial.value + '°';
+            });
+        }
+
+        // ===== ПРОВЕРКА =====
+        function checkTask(num) {
+            let completed = false;
+
+            if (num === 1) {
+                const val = parseInt(document.getElementById('slider').value);
+                completed = Math.abs(val - 45) < 2;
+            }
+
+            if (num === 2) {
+                const dropped = document.querySelectorAll('#dropZone .drag-item');
+                const correct = ['n₁', '·', 'sin', 'α', '=', 'n₂', '·', 'sin', 'β'];
+                if (dropped.length === correct.length) {
+                    completed = true;
+                    dropped.forEach((el, i) => {
+                        if (el.textContent !== correct[i]) completed = false;
+                    });
+                }
+            }
+
+            if (num === 3) {
+                completed = true; // Проверяется в мемори
+            }
+
+            if (num === 4) {
+                completed = true; // Просто рисует
+            }
+
+            if (num === 5) {
+                const val = parseInt(document.getElementById('dial').value);
+                completed = Math.abs(val - 60) < 5;
+            }
+
+            if (completed && currentTask < 10) {
+                // Следующее задание
+                currentTask++;
+                db.ref(`games/${currentGameId}/players/${playerName}/task`).set(currentTask);
+                showTask(currentTask);
+            } else if (completed && currentTask === 10) {
+                alert('🎉 ПОЗДРАВЛЯЮ! Все задания выполнены!');
+            } else {
+                alert('попробуй ещё раз');
+            }
+        }
+
+        function showError(msg) {
+            document.getElementById('error').textContent = msg;
         }
 
         // Формат кода
