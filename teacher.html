@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Учитель - Преломление света</title>
+    <title>Учитель · поле</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <style>
-        /* СТИЛИ КАК В ПРЕДЫДУЩЕМ ФАЙЛЕ */
         * {
             margin: 0;
             padding: 0;
@@ -16,47 +15,57 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: white;
+            font-family: 'Georgia', serif;
+            background: linear-gradient(145deg, #2b1b0e, #6b3f1c);
             min-height: 100vh;
             padding: 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 70% 30%, rgba(255, 180, 60, 0.2) 0%, transparent 50%);
+            pointer-events: none;
         }
 
         .dashboard {
             max-width: 1400px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1.5fr 1fr;
+            grid-template-columns: 2fr 1fr;
             gap: 20px;
-            height: calc(100vh - 40px);
+            position: relative;
+            z-index: 10;
         }
 
-        /* ЛЕВАЯ ПАНЕЛЬ */
-        .main-panel {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border-radius: 32px;
-            padding: 25px;
-            overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        .panel {
+            background: rgba(40, 25, 10, 0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 40px;
+            padding: 30px;
+            border: 1px solid rgba(255, 200, 120, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .create-btn {
-            background: linear-gradient(135deg, #8b5cf6, #6366f1);
-            border: none;
-            color: white;
+            background: linear-gradient(145deg, #b45f1b, #7b3f0e);
+            border: 1px solid #ffb45b;
+            color: #ffebc0;
             padding: 15px 30px;
             border-radius: 40px;
-            font-size: 1.1rem;
-            font-weight: 700;
+            font-size: 1.2rem;
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -65,52 +74,59 @@
             transform: scale(0.95);
         }
 
-        .code-display {
-            background: rgba(139, 92, 246, 0.2);
-            border: 1px solid rgba(139, 92, 246, 0.3);
+        .code-box {
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 30px;
             padding: 20px;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
+        }
+
+        .code-label {
+            color: #ffd89c;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .code-number {
-            font-size: 4rem;
-            font-family: monospace;
-            font-weight: 900;
-            color: #c4b5fd;
-            letter-spacing: 10px;
-        }
-
-        .timer-large {
             font-size: 5rem;
             font-family: monospace;
-            font-weight: 900;
-            color: #fbbf24;
-            text-align: center;
-            margin: 20px 0;
-            text-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+            color: #ffd966;
+            text-shadow: 0 0 30px #ff9f4b;
+            letter-spacing: 15px;
+            margin: 10px 0;
         }
 
-        .control-buttons {
+        .timer {
+            font-size: 4rem;
+            font-family: monospace;
+            color: #f9c35c;
+            text-align: center;
+            margin: 30px 0;
+            text-shadow: 0 0 20px #ff8c42;
+        }
+
+        .controls {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 10px;
-            margin: 25px 0;
+            margin: 30px 0;
         }
 
         .control-btn {
             padding: 15px;
-            border: none;
-            border-radius: 20px;
-            font-weight: 700;
+            border: 1px solid rgba(255, 180, 80, 0.3);
+            background: rgba(80, 40, 10, 0.6);
+            color: #ffd9a5;
+            border-radius: 30px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        .start-btn { background: linear-gradient(135deg, #4ade80, #22c55e); color: white; }
-        .pause-btn { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; }
-        .reset-btn { background: linear-gradient(135deg, #f87171, #ef4444); color: white; }
+        .control-btn:active {
+            background: #b45f1b;
+        }
 
         .students-grid {
             display: grid;
@@ -120,29 +136,28 @@
         }
 
         .student-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 24px;
+            background: rgba(60, 35, 15, 0.6);
+            border: 1px solid rgba(255, 180, 80, 0.2);
+            border-radius: 25px;
             padding: 20px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
         .student-card:hover {
-            background: rgba(139, 92, 246, 0.1);
-            border-color: #8b5cf6;
+            border-color: #ffb45b;
             transform: translateY(-5px);
         }
 
         .student-name {
-            font-size: 1.2rem;
-            font-weight: 700;
+            font-size: 1.3rem;
+            color: #ffd89c;
             margin-bottom: 10px;
         }
 
-        .progress-bar {
+        .student-progress {
             height: 8px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 10px;
             overflow: hidden;
             margin: 10px 0;
@@ -150,150 +165,77 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #8b5cf6, #6366f1);
+            background: linear-gradient(90deg, #d98f3a, #ffb45b);
             transition: width 0.3s ease;
-        }
-
-        /* ПРАВАЯ ПАНЕЛЬ */
-        .right-panel {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border-radius: 32px;
-            padding: 25px;
-            overflow-y: auto;
         }
 
         .leaderboard-item {
             display: flex;
             justify-content: space-between;
             padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 180, 80, 0.2);
+            color: #ffd9a5;
         }
 
         .rank-1 { color: gold; }
         .rank-2 { color: silver; }
         .rank-3 { color: #cd7f32; }
 
-        .modal {
+        .hidden {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-        }
-
-        .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(145deg, #1e1a3a, #141128);
-            border-radius: 32px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-        }
-
-        .close {
-            position: absolute;
-            top: 20px;
-            right: 25px;
-            font-size: 2rem;
-            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <div class="dashboard">
-        <!-- ЛЕВАЯ ПАНЕЛЬ -->
-        <div class="main-panel">
+        <div class="panel">
             <div class="header">
-                <h1><i class="fas fa-chalkboard-teacher"></i> Учитель</h1>
+                <h1 style="color: #ffd89c;">👨‍🌾 поле</h1>
                 <button class="create-btn" onclick="createExam()">
-                    <i class="fas fa-plus"></i> СОЗДАТЬ ТЕСТ
+                    🌾 создать поле
                 </button>
             </div>
 
-            <!-- КОД ТЕСТА -->
-            <div id="codeSection" style="display: none;">
-                <div class="code-display">
-                    <div style="color: #94a3b8; margin-bottom: 10px;">КОД ТЕСТА</div>
+            <div id="codeSection" class="hidden">
+                <div class="code-box">
+                    <div class="code-label">код поля</div>
                     <div class="code-number" id="examCode">000000</div>
                 </div>
 
-                <!-- ТАЙМЕР -->
-                <div class="timer-large" id="globalTimer">15:00</div>
+                <div class="timer" id="globalTimer">15:00</div>
 
-                <!-- КНОПКИ УПРАВЛЕНИЯ -->
-                <div class="control-buttons">
-                    <button class="control-btn start-btn" onclick="startExam()">
-                        <i class="fas fa-play"></i> СТАРТ
-                    </button>
-                    <button class="control-btn pause-btn" onclick="pauseExam()">
-                        <i class="fas fa-pause"></i> ПАУЗА
-                    </button>
-                    <button class="control-btn reset-btn" onclick="resetExam()">
-                        <i class="fas fa-stop"></i> СТОП
-                    </button>
+                <div class="controls">
+                    <button class="control-btn" onclick="startExam()">🌅 старт</button>
+                    <button class="control-btn" onclick="pauseExam()">⏸️ пауза</button>
+                    <button class="control-btn" onclick="endExam()">🌾 финиш</button>
                 </div>
 
-                <!-- СПИСОК УЧЕНИКОВ -->
-                <h2 style="margin: 25px 0 15px 0;">👥 Ученики (<span id="studentCount">0</span>)</h2>
-                <div id="studentsList" class="students-grid">
-                    <!-- Загружается через JS -->
-                </div>
+                <h2 style="color: #ffd89c; margin: 20px 0;">🌾 ученики</h2>
+                <div id="studentsList" class="students-grid"></div>
             </div>
 
-            <div id="noExam" style="text-align: center; margin-top: 100px; color: #64748b;">
-                <i class="fas fa-plus-circle" style="font-size: 5rem; margin-bottom: 20px;"></i>
-                <h3>Создайте новый тест</h3>
-                <p>Нажмите кнопку "СОЗДАТЬ ТЕСТ" чтобы начать</p>
+            <div id="noExam" style="text-align: center; padding: 50px; color: #b98f5a;">
+                🌅 создай поле, чтобы начать
             </div>
         </div>
 
-        <!-- ПРАВАЯ ПАНЕЛЬ (ЛИДЕРБОРД) -->
-        <div class="right-panel">
-            <h2><i class="fas fa-trophy"></i> ЛИДЕРЫ</h2>
-            <div id="leaderboardList">
-                <div style="text-align: center; color: #64748b; margin-top: 50px;">
-                    Пока нет участников
-                </div>
+        <div class="panel">
+            <h2 style="color: #ffd89c; margin-bottom: 25px;">🏆 лидеры</h2>
+            <div id="leaderboardList"></div>
+            
+            <div style="margin-top: 30px; color: #e5c7a2;">
+                <div>✅ завершили: <span id="completedCount">0</span></div>
+                <div>🌾 всего: <span id="totalCount">0</span></div>
             </div>
-
-            <div style="margin-top: 30px;">
-                <h3><i class="fas fa-chart-bar"></i> Статистика</h3>
-                <div style="margin-top: 15px;">
-                    <div>✅ Завершили: <span id="completedCount">0</span></div>
-                    <div>📊 Средний прогресс: <span id="avgProgress">0</span>%</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- МОДАЛКА ДЛЯ ПРОСМОТРА УЧЕНИКА -->
-    <div id="studentModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <div id="modalContent"></div>
         </div>
     </div>
 
     <script src="firebase-config.js"></script>
-    <script src="physics-data.js"></script>
     <script>
-        // ============================================
-        // teacher.js - С ФИКСОМ showLeaderboard
-        // ============================================
-
         let currentExamId = null;
         let examStartTime = null;
         let timerInterval = null;
 
-        // ===== СОЗДАНИЕ ТЕСТА =====
         function createExam() {
             const code = Math.floor(100000 + Math.random() * 900000).toString();
             currentExamId = `exam_${code}`;
@@ -303,22 +245,18 @@
                 created: Date.now(),
                 status: "waiting",
                 startTime: null,
-                timeLimit: EXAM_DATA.timeLimit,
-                tasks: EXAM_DATA.tasks,
+                timeLimit: 20 * 60,
                 players: {}
             };
 
             db.ref(`exams/${currentExamId}`).set(examData).then(() => {
-                document.getElementById('noExam').style.display = 'none';
-                document.getElementById('codeSection').style.display = 'block';
+                document.getElementById('noExam').classList.add('hidden');
+                document.getElementById('codeSection').classList.remove('hidden');
                 document.getElementById('examCode').textContent = code;
-
-                // Слушаем изменения
                 listenToExam();
             });
         }
 
-        // ===== СЛУШАЕМ ТЕСТ =====
         function listenToExam() {
             if (!currentExamId) return;
 
@@ -326,13 +264,9 @@
                 const exam = snapshot.val();
                 if (!exam) return;
 
-                // Обновляем список учеников
                 updateStudentsList(exam.players);
-
-                // Обновляем лидерборд
                 updateLeaderboard(exam.players);
 
-                // Обновляем таймер
                 if (exam.status === 'active' && exam.startTime) {
                     examStartTime = exam.startTime;
                     updateTimer(exam.timeLimit, exam.startTime);
@@ -340,87 +274,60 @@
             });
         }
 
-        // ===== ОБНОВЛЕНИЕ СПИСКА УЧЕНИКОВ =====
         function updateStudentsList(players) {
-            const container = document.getElementById('studentsList');
-            const count = document.getElementById('studentCount');
-
-            if (!players || Object.keys(players).length === 0) {
-                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #64748b;">Ожидание учеников...</div>';
-                count.textContent = '0';
+            const list = document.getElementById('studentsList');
+            if (!players) {
+                list.innerHTML = '<div style="color: #b98f5a;">ждём путников...</div>';
                 return;
             }
 
             const playerArray = Object.entries(players);
-            count.textContent = playerArray.length;
+            document.getElementById('totalCount').textContent = playerArray.length;
 
-            container.innerHTML = playerArray.map(([name, data]) => `
-                <div class="student-card" onclick="showStudentDetails('${name}')">
+            list.innerHTML = playerArray.map(([name, data]) => `
+                <div class="student-card">
                     <div class="student-name">${name}</div>
-                    <div class="progress-bar">
+                    <div class="student-progress">
                         <div class="progress-fill" style="width: ${data.progress || 0}%"></div>
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>✨ ${data.score || 0}</span>
                         <span>${data.progress || 0}%</span>
-                        <span>⭐ ${data.score || 0}</span>
-                    </div>
-                    <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 10px;">
-                        Задание ${data.currentTask || 1}/${EXAM_DATA.totalTasks}
                     </div>
                 </div>
-            `).join('');
-
-            // Обновляем статистику
-            const completed = playerArray.filter(([_, d]) => d.progress === 100).length;
-            const avgProgress = playerArray.reduce((acc, [_, d]) => acc + (d.progress || 0), 0) / playerArray.length;
-
-            document.getElementById('completedCount').textContent = completed;
-            document.getElementById('avgProgress').textContent = Math.round(avgProgress);
+            `).join(''));
         }
 
-        // ===== ОБНОВЛЕНИЕ ЛИДЕРБОРДА =====
         function updateLeaderboard(players) {
-            const container = document.getElementById('leaderboardList');
-
-            if (!players || Object.keys(players).length === 0) {
-                container.innerHTML = '<div style="text-align: center; color: #64748b;">Пока нет участников</div>';
-                return;
-            }
+            if (!players) return;
 
             const sorted = Object.entries(players)
+                .filter(([_, d]) => d.score !== undefined)
                 .sort((a, b) => b[1].score - a[1].score)
                 .slice(0, 10);
 
-            container.innerHTML = sorted.map(([name, data], i) => `
+            document.getElementById('leaderboardList').innerHTML = sorted.map(([name, data], i) => `
                 <div class="leaderboard-item">
                     <span class="rank-${i+1}">${i+1}. ${name}</span>
-                    <span>${data.score} ⭐</span>
+                    <span>✨ ${data.score}</span>
                 </div>
-            `).join('');
+            `).join(''));
+
+            const completed = Object.values(players).filter(p => p.progress === 100).length;
+            document.getElementById('completedCount').textContent = completed;
         }
 
-        // ===== ФУНКЦИЯ showLeaderboard (ИСПРАВЛЕНА) =====
-        function showLeaderboard() {
-            if (!currentExamId) return;
-            
-            db.ref(`exams/${currentExamId}/players`).once('value', (snapshot) => {
-                const players = snapshot.val() || {};
-                updateLeaderboard(players);
-            });
-        }
-
-        // ===== ТАЙМЕР =====
-        function updateTimer(timeLimit, startTime) {
+        function updateTimer(limit, start) {
             if (timerInterval) clearInterval(timerInterval);
 
             timerInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const remaining = Math.max(0, timeLimit - elapsed);
-
+                const elapsed = Math.floor((Date.now() - start) / 1000);
+                const remaining = Math.max(0, limit - elapsed);
+                
                 const mins = Math.floor(remaining / 60);
                 const secs = remaining % 60;
                 document.getElementById('globalTimer').textContent = 
-                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
 
                 if (remaining <= 0) {
                     clearInterval(timerInterval);
@@ -429,62 +336,23 @@
             }, 1000);
         }
 
-        // ===== НАЧАЛО ТЕСТА =====
         function startExam() {
             if (!currentExamId) return;
-
             db.ref(`exams/${currentExamId}`).update({
                 status: "active",
                 startTime: Date.now()
             });
         }
 
-        // ===== ПАУЗА =====
         function pauseExam() {
             if (!currentExamId) return;
             db.ref(`exams/${currentExamId}`).update({ status: "paused" });
         }
 
-        // ===== СБРОС =====
-        function resetExam() {
-            if (!currentExamId || !confirm('Завершить тест?')) return;
-
+        function endExam() {
+            if (!currentExamId) return;
             db.ref(`exams/${currentExamId}`).update({ status: "finished" });
             clearInterval(timerInterval);
-            
-            showLeaderboard();
-        }
-
-        // ===== ЗАВЕРШЕНИЕ =====
-        function endExam() {
-            db.ref(`exams/${currentExamId}`).update({ status: "finished" });
-            showLeaderboard();
-        }
-
-        // ===== ДЕТАЛИ УЧЕНИКА =====
-        function showStudentDetails(name) {
-            const modal = document.getElementById('studentModal');
-            const content = document.getElementById('modalContent');
-
-            db.ref(`exams/${currentExamId}/players/${name}`).once('value', (snapshot) => {
-                const data = snapshot.val();
-
-                content.innerHTML = `
-                    <h2 style="margin-bottom: 20px;">${name}</h2>
-                    <div style="background: rgba(139, 92, 246, 0.1); padding: 20px; border-radius: 20px;">
-                        <p>⭐ Очки: ${data.score || 0}</p>
-                        <p>📊 Прогресс: ${data.progress || 0}%</p>
-                        <p>📝 Текущее задание: ${data.currentTask || 1}/${EXAM_DATA.totalTasks}</p>
-                        <p>⏱️ Время входа: ${new Date(data.joinedAt).toLocaleTimeString()}</p>
-                    </div>
-                `;
-            });
-
-            modal.style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('studentModal').style.display = 'none';
         }
     </script>
 </body>
