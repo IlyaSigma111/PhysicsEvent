@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🌅 игра · преломление</title>
+    <title>🌅 преломление · 20 заданий</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -13,16 +13,17 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
         body {
-            font-family: 'Georgia', serif;
+            font-family: 'Georgia', 'Times New Roman', serif;
             background: linear-gradient(145deg, #2b1b0e, #8b4f1c);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 12px;
             position: relative;
         }
 
@@ -43,15 +44,15 @@
         body::after {
             content: '';
             position: fixed;
-            top: 10%;
+            top: 5%;
             right: 5%;
-            width: 150px;
-            height: 150px;
+            width: 200px;
+            height: 200px;
             background: radial-gradient(circle, #ffb347 0%, #ff8c42 60%, transparent 80%);
             border-radius: 50%;
-            filter: blur(30px);
+            filter: blur(40px);
             opacity: 0.5;
-            animation: sunGlow 10s infinite alternate;
+            animation: sunGlow 8s infinite alternate;
             pointer-events: none;
         }
 
@@ -66,7 +67,7 @@
             background: rgba(40, 25, 10, 0.8);
             backdrop-filter: blur(15px);
             border-radius: 48px;
-            padding: 24px 20px;
+            padding: 20px 16px;
             border: 1px solid rgba(255, 200, 120, 0.3);
             box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
             position: relative;
@@ -85,18 +86,18 @@
 
         .sunset {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         .sun-large {
-            font-size: 80px;
+            font-size: 70px;
             filter: drop-shadow(0 0 30px #ff9f4b);
-            animation: sunFloat 6s infinite alternate;
+            animation: sunFloat 5s infinite alternate;
         }
 
         @keyframes sunFloat {
             0% { transform: translateY(0); }
-            100% { transform: translateY(-10px); }
+            100% { transform: translateY(-8px); }
         }
 
         .title {
@@ -104,41 +105,40 @@
             color: #ffebc0;
             text-shadow: 0 4px 15px #b45f1b;
             font-weight: 400;
-            margin: 10px 0 5px;
+            margin: 5px 0;
         }
 
         .game-sub {
             color: #f9d9a5;
             font-style: italic;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
 
         .join-card {
             background: rgba(60, 35, 15, 0.6);
             border-radius: 32px;
-            padding: 24px;
+            padding: 20px;
             border: 1px solid rgba(255, 180, 80, 0.3);
-            margin-bottom: 20px;
         }
 
         .input-field {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .input-label {
             display: block;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             color: #ffd89c;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             letter-spacing: 1px;
         }
 
         .input-box {
             width: 100%;
-            padding: 18px 20px;
+            padding: 16px 18px;
             background: rgba(20, 10, 5, 0.6);
             border: 2px solid rgba(255, 180, 80, 0.3);
-            border-radius: 24px;
+            border-radius: 30px;
             color: #ffefd0;
             font-size: 1.2rem;
             transition: all 0.2s ease;
@@ -153,22 +153,22 @@
         .code-input {
             font-family: monospace;
             font-size: 2rem;
-            letter-spacing: 8px;
+            letter-spacing: 6px;
             text-align: center;
         }
 
         .join-btn {
             width: 100%;
-            padding: 20px;
+            padding: 18px;
             background: linear-gradient(145deg, #b45f1b, #7b3f0e);
             border: 1px solid #ffb45b;
             border-radius: 40px;
             color: #ffebc0;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            margin-top: 8px;
         }
 
         .join-btn:active {
@@ -181,59 +181,64 @@
         }
 
         .waiting-header {
-            background: rgba(40, 20, 5, 0.6);
+            background: rgba(40, 20, 5, 0.7);
             border-radius: 30px;
-            padding: 30px;
-            margin-bottom: 25px;
+            padding: 24px;
+            margin-bottom: 20px;
             border: 1px solid rgba(255, 180, 80, 0.3);
         }
 
         .waiting-code {
-            font-size: 3.5rem;
+            font-size: 3rem;
             font-family: monospace;
             color: #ffd966;
             text-shadow: 0 0 30px #ff9f4b;
-            letter-spacing: 10px;
-            margin: 15px 0;
+            letter-spacing: 8px;
+            margin: 12px 0;
         }
 
         .firefly {
             display: inline-block;
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             background: #ffecb3;
             border-radius: 50%;
-            margin-right: 8px;
-            animation: firefly 2s infinite;
-            box-shadow: 0 0 20px #ffd700;
+            margin-right: 6px;
+            animation: firefly 1.5s infinite;
         }
 
         @keyframes firefly {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.3); }
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .players-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 15px 0;
         }
 
         .player-badge {
-            display: inline-block;
             background: rgba(180, 100, 30, 0.3);
             border: 1px solid rgba(255, 180, 80, 0.3);
-            border-radius: 40px;
-            padding: 10px 18px;
-            margin: 5px;
+            border-radius: 30px;
+            padding: 8px 14px;
             color: #ffd9a5;
-            backdrop-filter: blur(5px);
+            font-size: 0.9rem;
         }
 
         /* СПИСОК ЗАДАНИЙ */
         .tasks-screen {
-            animation: fadeIn 0.5s ease;
+            animation: fadeIn 0.4s ease;
         }
 
         .tasks-header {
-            background: rgba(40, 20, 5, 0.6);
+            background: rgba(40, 20, 5, 0.7);
             border-radius: 30px;
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 16px 18px;
+            margin-bottom: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -241,30 +246,34 @@
         }
 
         .tasks-timer {
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-family: monospace;
             color: #ffd966;
-            text-shadow: 0 0 20px #ff9f4b;
+            text-shadow: 0 0 15px #ff9f4b;
         }
 
         .tasks-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin: 20px 0;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin: 16px 0;
             max-height: 400px;
             overflow-y: auto;
-            padding: 5px;
+            padding: 4px;
         }
 
         .task-item {
             background: rgba(60, 35, 15, 0.6);
             border: 1px solid rgba(255, 180, 80, 0.2);
-            border-radius: 24px;
-            padding: 20px 10px;
+            border-radius: 20px;
+            padding: 12px 4px;
             text-align: center;
             cursor: pointer;
             transition: all 0.2s ease;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .task-item.completed {
@@ -272,37 +281,32 @@
             border-color: #b8860b;
         }
 
-        .task-item.current {
-            border: 2px solid #ffb45b;
-            box-shadow: 0 0 20px rgba(255, 180, 80, 0.3);
-        }
-
         .task-number {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: #ffd89c;
         }
 
         .task-check {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #7cb342;
         }
 
         .send-btn {
             width: 100%;
-            padding: 22px;
+            padding: 18px;
             background: linear-gradient(145deg, #9d6b2e, #6b3f19);
             border: 1px solid #ffb45b;
             border-radius: 40px;
             color: #ffefd0;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             cursor: pointer;
-            margin: 20px 0;
+            margin: 16px 0 8px;
             transition: all 0.2s ease;
         }
 
         .send-btn.active {
             background: linear-gradient(145deg, #c88c2e, #9d5719);
-            box-shadow: 0 0 30px #ffb347;
+            box-shadow: 0 0 20px #ffb347;
         }
 
         /* ДЕТАЛИ ЗАДАНИЯ */
@@ -319,55 +323,151 @@
             background: rgba(60, 35, 15, 0.6);
             border: 1px solid rgba(255, 180, 80, 0.3);
             color: #ffd89c;
-            padding: 12px 20px;
+            padding: 10px 18px;
             border-radius: 30px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.2s ease;
-        }
-
-        .back-btn:active {
-            background: rgba(180, 100, 30, 0.5);
+            font-size: 0.95rem;
+            width: fit-content;
         }
 
         .task-content {
             background: rgba(40, 20, 5, 0.7);
             border-radius: 32px;
-            padding: 25px;
+            padding: 24px 20px;
         }
 
-        .task-question {
-            font-size: 1.3rem;
-            color: #ffefd0;
-            line-height: 1.6;
-            margin-bottom: 25px;
+        .task-title {
+            font-size: 1.5rem;
+            color: #ffd89c;
+            margin-bottom: 8px;
         }
 
-        /* ОПЦИИ */
+        .task-desc {
+            color: #e5c7a2;
+            margin-bottom: 24px;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        /* КНОПКИ ДЛЯ ЗАДАНИЙ */
         .options-grid {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
+            margin: 20px 0;
         }
 
-        .option-row {
+        .option-btn {
+            width: 100%;
             padding: 18px;
-            background: rgba(20, 10, 5, 0.6);
-            border: 1px solid rgba(255, 180, 80, 0.2);
-            border-radius: 20px;
+            background: rgba(30, 15, 5, 0.7);
+            border: 2px solid rgba(255, 180, 80, 0.3);
+            border-radius: 30px;
+            color: #ffefd0;
+            font-size: 1.1rem;
             cursor: pointer;
-            color: #ffd9a5;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .option-btn:active {
+            background: rgba(180, 100, 30, 0.5);
+            transform: scale(0.98);
+        }
+
+        .option-btn.selected {
+            background: rgba(180, 100, 30, 0.6);
+            border-color: #ffb45b;
+        }
+
+        /* СЛАЙДЕР */
+        .slider-container {
+            padding: 20px 0;
+        }
+
+        .slider-value {
+            font-size: 2.5rem;
+            color: #ffd966;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        input[type=range] {
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(90deg, #b45f1b, #ffb45b);
+            border-radius: 10px;
+            -webkit-appearance: none;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 40px;
+            height: 40px;
+            background: #ffd966;
+            border-radius: 50%;
+            border: 3px solid #b45f1b;
+            box-shadow: 0 0 15px #ff9f4b;
+            cursor: pointer;
+        }
+
+        /* ПОРЯДОК */
+        .order-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .order-item {
+            padding: 16px;
+            background: rgba(60, 35, 15, 0.6);
+            border: 1px solid rgba(255, 180, 80, 0.3);
+            border-radius: 30px;
+            cursor: pointer;
+            text-align: center;
             transition: all 0.2s ease;
         }
 
-        .option-row:active {
-            background: rgba(180, 100, 30, 0.4);
-        }
-
-        .option-row.selected {
+        .order-item.selected {
             background: rgba(180, 100, 30, 0.5);
             border-color: #ffb45b;
+        }
+
+        /* ДЛЯ ПЕРЕТАСКИВАНИЯ */
+        .drag-area {
+            min-height: 60px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px dashed #ffb45b;
+            border-radius: 30px;
+            margin: 15px 0;
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .drag-item {
+            padding: 12px 18px;
+            background: rgba(180, 100, 30, 0.5);
+            border: 1px solid #ffb45b;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        /* ИНПУТ ДЛЯ ЧИСЕЛ */
+        .number-input {
+            width: 100%;
+            padding: 18px;
+            font-size: 2rem;
+            text-align: center;
+            background: rgba(20, 10, 5, 0.7);
+            border: 2px solid #ffb45b;
+            border-radius: 30px;
+            color: #ffefd0;
+            margin: 20px 0;
         }
 
         /* РЕЗУЛЬТАТЫ */
@@ -378,28 +478,26 @@
         .result-card {
             background: rgba(40, 20, 5, 0.8);
             border-radius: 32px;
-            padding: 30px;
-            border: 1px solid rgba(255, 180, 80, 0.3);
+            padding: 24px;
         }
 
         .final-score {
-            font-size: 4rem;
+            font-size: 3.5rem;
             color: #ffd966;
             text-shadow: 0 0 30px #ff9f4b;
-            margin: 20px 0;
+            margin: 15px 0;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 180, 80, 0.2);
+            color: #ffd9a5;
         }
 
         .hidden {
             display: none !important;
-        }
-
-        .error-message {
-            color: #ff6b6b;
-            padding: 15px;
-            text-align: center;
-            background: rgba(255, 0, 0, 0.1);
-            border-radius: 20px;
-            margin: 10px 0;
         }
     </style>
 </head>
@@ -415,8 +513,8 @@
 
             <div class="join-card">
                 <div class="input-field">
-                    <label class="input-label">имя</label>
-                    <input type="text" id="playerName" class="input-box" placeholder="твоё имя" maxlength="15">
+                    <label class="input-label">твоё имя</label>
+                    <input type="text" id="playerName" class="input-box" placeholder="путник" maxlength="15">
                 </div>
 
                 <div class="input-field">
@@ -424,33 +522,25 @@
                     <input type="text" id="gameCode" class="input-box code-input" placeholder="000000" maxlength="6" inputmode="numeric">
                 </div>
 
-                <button class="join-btn" onclick="joinGame()">
-                    🌅 войти в игру
-                </button>
+                <button class="join-btn" onclick="joinGame()">войти в игру</button>
             </div>
 
-            <div id="joinError" class="error-message hidden"></div>
+            <div id="joinError" style="color: #ff6b6b; text-align: center; margin-top: 10px; font-size: 0.9rem;"></div>
         </div>
 
         <!-- ОЖИДАНИЕ -->
         <div id="waitingScreen" class="waiting-screen hidden">
             <div class="waiting-header">
                 <span class="firefly"></span>
-                <span style="color: #ffd89c;">ожидание старта</span>
+                <span style="color: #ffd89c;">ожидание</span>
                 <div class="waiting-code" id="displayCode">000000</div>
-                <div id="displayName" style="color: #f9d9a5; font-size: 1.2rem;"></div>
+                <div id="displayName" style="color: #f9d9a5;"></div>
             </div>
 
-            <div style="margin: 20px 0;">
-                <div style="color: #ffd89c; margin-bottom: 15px;">участники</div>
-                <div id="playersList" class="players-list">
-                    <span class="player-badge">⏳ загрузка...</span>
-                </div>
+            <div class="players-list" id="playersList">
+                <span class="player-badge">ждём...</span>
             </div>
-
-            <div style="color: #b98f5a;">
-                <i class="fas fa-users"></i> <span id="playerCount">0</span> в игре
-            </div>
+            <div style="color: #b98f5a; margin-top: 10px;">участников: <span id="playerCount">0</span></div>
         </div>
 
         <!-- СПИСОК ЗАДАНИЙ -->
@@ -462,18 +552,14 @@
 
             <div id="tasksGrid" class="tasks-grid"></div>
 
-            <button class="send-btn" id="sendResultsBtn" onclick="showResults()">
-                🌅 завершить и отправить
-            </button>
+            <button class="send-btn" id="sendBtn" onclick="finishGame()">✨ завершить</button>
         </div>
 
         <!-- ДЕТАЛИ ЗАДАНИЯ -->
         <div id="taskDetailScreen" class="task-detail-screen hidden">
-            <button class="back-btn" onclick="backToTasks()">
-                ← к списку заданий
-            </button>
+            <button class="back-btn" onclick="backToTasks()">← назад</button>
 
-            <div id="taskDetailContent" class="task-content">
+            <div id="taskContent" class="task-content">
                 <!-- загружается -->
             </div>
         </div>
@@ -483,9 +569,9 @@
             <div class="result-card">
                 <div class="sun-large">✨</div>
                 <div class="final-score" id="finalScore">0</div>
-                <div id="resultDetails" style="color: #ffd9a5; margin: 20px 0;"></div>
-                <div id="leaderboardList" style="margin: 25px 0;"></div>
-                <button class="join-btn" onclick="exitGame()">выйти из игры</button>
+                <div id="resultMessage" style="color: #ffd9a5; margin: 15px 0;"></div>
+                <div id="finalLeaderboard"></div>
+                <button class="join-btn" onclick="exitGame()" style="margin-top: 20px;">выйти</button>
             </div>
         </div>
     </div>
@@ -493,166 +579,227 @@
     <script src="firebase-config.js"></script>
     <script>
         // ============================================
-        // student.js - ИСПРАВЛЕННАЯ ВЕРСИЯ
+        // 20 РАБОЧИХ ЗАДАНИЙ
         // ============================================
 
+        const TASKS = [
+            {   // 1
+                title: "🌅 угол заката",
+                desc: "под каким углом солнце садится за горизонт?",
+                options: ["30°", "45°", "60°", "90°"],
+                correct: 3
+            },
+            {   // 2
+                title: "💧 скорость света",
+                desc: "где скорость света меньше всего?",
+                options: ["в воздухе", "в воде", "в стекле", "в вакууме"],
+                correct: 2
+            },
+            {   // 3
+                title: "📐 закон преломления",
+                desc: "выбери правильную формулу",
+                options: ["n₁·sinα = n₂·sinβ", "n₁·sinβ = n₂·sinα", "sinα/n₁ = sinβ/n₂"],
+                correct: 0
+            },
+            {   // 4
+                title: "⚡ углы",
+                desc: "при переходе из воздуха в воду угол преломления ...",
+                options: ["больше", "меньше", "равен"],
+                correct: 1
+            },
+            {   // 5
+                title: "🌈 радуга",
+                desc: "какой цвет преломляется сильнее?",
+                options: ["красный", "зелёный", "синий", "фиолетовый"],
+                correct: 3
+            },
+            {   // 6
+                title: "🔍 полное отражение",
+                desc: "при каком условии оно возможно?",
+                options: ["из воды в воздух", "из воздуха в воду", "всегда", "никогда"],
+                correct: 0
+            },
+            {   // 7
+                title: "🧮 показатель",
+                desc: "n = 300000 / 200000 = ?",
+                options: ["0.5", "1", "1.5", "2"],
+                correct: 2
+            },
+            {   // 8
+                title: "🐟 рыбка",
+                desc: "рыба в воде кажется ...",
+                options: ["ближе", "дальше", "такой же"],
+                correct: 0
+            },
+            {   // 9
+                title: "🔺 призма",
+                desc: "луч в призме отклоняется к ...",
+                options: ["основанию", "вершине", "прямо"],
+                correct: 0
+            },
+            {   // 10
+                title: "🌅 закат",
+                desc: "почему небо красное?",
+                options: ["красный меньше рассеивается", "солнце остывает", "воздух краснеет"],
+                correct: 0
+            },
+            {   // 11
+                title: "📏 угол падения",
+                desc: "угол падения = 30°, угол отражения = ?",
+                options: ["30°", "60°", "90°"],
+                correct: 0
+            },
+            {   // 12
+                title: "💎 алмаз",
+                desc: "показатель преломления алмаза ≈",
+                options: ["1.3", "1.5", "2.4", "3.5"],
+                correct: 2
+            },
+            {   // 13
+                title: "🌊 вода",
+                desc: "показатель преломления воды",
+                options: ["1", "1.33", "1.5", "2"],
+                correct: 1
+            },
+            {   // 14
+                title: "❓ линза",
+                desc: "собирающая линза ... лучи",
+                options: ["собирает", "рассеивает", "не меняет"],
+                correct: 0
+            },
+            {   // 15
+                title: "🔄 обратимость",
+                desc: "лучи обратимы?",
+                options: ["да", "нет", "иногда"],
+                correct: 0
+            },
+            {   // 16
+                title: "📐 синус",
+                desc: "sin30° = ?",
+                options: ["0", "0.5", "1", "1.5"],
+                correct: 1
+            },
+            {   // 17
+                title: "🔬 микроскоп",
+                desc: "микроскоп использует ...",
+                options: ["линзы", "зеркала", "призмы"],
+                correct: 0
+            },
+            {   // 18
+                title: "🔭 телескоп",
+                desc: "телескоп нужен чтобы ...",
+                options: ["увеличить", "приблизить", "увидеть далёкое"],
+                correct: 2
+            },
+            {   // 19
+                title: "⚡ скорость",
+                desc: "самая большая скорость у ...",
+                options: ["красного", "фиолетового", "одинаково"],
+                correct: 0
+            },
+            {   // 20
+                title: "🏆 финал",
+                desc: "свет — это ...",
+                options: ["волна", "частица", "и то и другое"],
+                correct: 2
+            }
+        ];
+
+        // Состояние игры
         let currentGameId = null;
         let playerName = null;
         let gameStartTime = null;
         let timerInterval = null;
         let playerAnswers = {};
-        let playerScore = 0;
+        let currentTaskIndex = 0;
         
-        // DOM элементы
+        // DOM
         const lobbyScreen = document.getElementById('lobbyScreen');
         const waitingScreen = document.getElementById('waitingScreen');
         const tasksScreen = document.getElementById('tasksScreen');
         const taskDetailScreen = document.getElementById('taskDetailScreen');
         const resultScreen = document.getElementById('resultScreen');
         const tasksGrid = document.getElementById('tasksGrid');
-        const sendBtn = document.getElementById('sendResultsBtn');
-        const joinError = document.getElementById('joinError');
+        const sendBtn = document.getElementById('sendBtn');
 
-        // Текущее задание
-        let currentTaskIndex = 0;
-
-        // ===== ВХОД В ИГРУ =====
+        // ===== ВХОД =====
         function joinGame() {
             const name = document.getElementById('playerName').value.trim();
             const code = document.getElementById('gameCode').value.trim();
 
-            // Прячем ошибку
-            joinError.classList.add('hidden');
-
             if (!name || name.length < 2) {
-                showError('напиши имя (минимум 2 буквы)');
+                document.getElementById('joinError').textContent = 'напиши имя';
                 return;
             }
 
             if (!code || code.length !== 6) {
-                showError('нужен 6-значный код игры');
+                document.getElementById('joinError').textContent = 'нужен 6-значный код';
                 return;
             }
 
             playerName = name;
             currentGameId = `game_${code}`;
 
-            // Показываем ожидание
             document.getElementById('displayName').textContent = name;
             document.getElementById('displayCode').textContent = code;
             
             lobbyScreen.classList.add('hidden');
             waitingScreen.classList.remove('hidden');
 
-            // Проверяем существование игры
-            db.ref(`games/${currentGameId}`).once('value')
-                .then((snapshot) => {
-                    const game = snapshot.val();
-                    
-                    if (!game) {
-                        showError('игра не найдена');
-                        lobbyScreen.classList.remove('hidden');
-                        waitingScreen.classList.add('hidden');
-                        return null;
-                    }
-
-                    // Регистрируем игрока
-                    const playerData = {
-                        name: name,
-                        joinedAt: Date.now(),
-                        score: 0,
-                        progress: 0,
-                        answers: {}
-                    };
-
-                    return db.ref(`games/${currentGameId}/players/${name}`).set(playerData)
-                        .then(() => {
-                            console.log('✅ Игрок зарегистрирован');
-                            listenToGame();
-                        });
-                })
-                .catch((error) => {
-                    console.error('❌ Ошибка:', error);
-                    showError('ошибка подключения');
-                    lobbyScreen.classList.remove('hidden');
-                    waitingScreen.classList.add('hidden');
-                });
-        }
-
-        function showError(text) {
-            joinError.textContent = text;
-            joinError.classList.remove('hidden');
-            setTimeout(() => joinError.classList.add('hidden'), 3000);
-        }
-
-        // ===== СЛУШАЕМ ИГРУ =====
-        function listenToGame() {
-            if (!currentGameId) return;
-
-            db.ref(`games/${currentGameId}`).on('value', (snapshot) => {
+            db.ref(`games/${currentGameId}`).once('value', (snapshot) => {
                 const game = snapshot.val();
                 if (!game) {
-                    showError('игра завершена');
-                    exitGame();
+                    document.getElementById('joinError').textContent = 'игра не найдена';
+                    lobbyScreen.classList.remove('hidden');
+                    waitingScreen.classList.add('hidden');
                     return;
                 }
 
-                // Обновляем список игроков
+                db.ref(`games/${currentGameId}/players/${name}`).set({
+                    name: name,
+                    joinedAt: Date.now(),
+                    score: 0,
+                    progress: 0,
+                    answers: {}
+                });
+                
+                listenToGame();
+            });
+        }
+
+        // ===== СЛУШАЕМ =====
+        function listenToGame() {
+            db.ref(`games/${currentGameId}`).on('value', (snapshot) => {
+                const game = snapshot.val();
+                if (!game) return;
+
                 updatePlayersList(game.players);
 
-                // Если игра началась
                 if (game.status === 'active' && !gameStartTime) {
                     gameStartTime = game.startTime;
                     startGame();
                 }
 
-                // Обновляем таймер
                 if (game.status === 'active' && gameStartTime) {
                     updateTimer(game.timeLimit, game.startTime);
-                }
-
-                // Если игра закончена
-                if (game.status === 'finished') {
-                    showFinalLeaderboard(game.players);
                 }
             });
         }
 
-        // ===== ОБНОВЛЕНИЕ СПИСКА ИГРОКОВ =====
-        function updatePlayersList(players) {
-            const list = document.getElementById('playersList');
-            const count = document.getElementById('playerCount');
-            
-            if (!players) {
-                list.innerHTML = '<span class="player-badge">⏳ ждём...</span>';
-                count.textContent = '0';
-                return;
-            }
-
-            const playerArray = Object.keys(players);
-            count.textContent = playerArray.length;
-
-            list.innerHTML = playerArray.map(name => 
-                `<span class="player-badge">🌾 ${name}</span>`
-            ).join('');
-        }
-
-        // ===== НАЧАЛО ИГРЫ =====
+        // ===== НАЧАЛО =====
         function startGame() {
             waitingScreen.classList.add('hidden');
             tasksScreen.classList.remove('hidden');
-            
-            // Загружаем список заданий
             renderTasksGrid();
         }
 
         // ===== ТАЙМЕР =====
-        function updateTimer(timeLimit, startTime) {
+        function updateTimer(limit, start) {
             if (timerInterval) clearInterval(timerInterval);
 
             timerInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const remaining = Math.max(0, timeLimit - elapsed);
+                const elapsed = Math.floor((Date.now() - start) / 1000);
+                const remaining = Math.max(0, limit - elapsed);
                 
                 const mins = Math.floor(remaining / 60);
                 const secs = remaining % 60;
@@ -661,138 +808,12 @@
 
                 if (remaining <= 0) {
                     clearInterval(timerInterval);
-                    showResults();
+                    finishGame();
                 }
             }, 1000);
         }
 
-        // ===== ЗАДАНИЯ =====
-        const TASKS = [
-            {
-                id: 1,
-                title: "🌊 попади в рыбку",
-                desc: "перетащи ползунок, чтобы луч попал в цель",
-                type: "slider"
-            },
-            {
-                id: 2,
-                title: "🌾 найди лишнее",
-                desc: "что НЕ является средой для света?",
-                type: "choose",
-                options: ["💧 вода", "💎 стекло", "☁️ воздух", "🌑 темнота"],
-                correct: 3
-            },
-            {
-                id: 3,
-                title: "📐 собери формулу",
-                desc: "перетащи элементы в правильном порядке",
-                type: "dragdrop"
-            },
-            {
-                id: 4,
-                title: "🃏 найди пару",
-                desc: "соедини термин с определением",
-                type: "memory"
-            },
-            {
-                id: 5,
-                title: "↻ поймай угол",
-                desc: "выстави угол 45°",
-                type: "angle"
-            },
-            {
-                id: 6,
-                title: "🌀 проведи луч",
-                desc: "проведи луч через все среды к финишу",
-                type: "maze"
-            },
-            {
-                id: 7,
-                title: "🌈 разложи радугу",
-                desc: "расположи цвета по порядку",
-                type: "rainbow"
-            },
-            {
-                id: 8,
-                title: "🔺 собери призму",
-                desc: "перетащи кусочки на место",
-                type: "puzzle"
-            },
-            {
-                id: 9,
-                title: "🪞 зеркальный лабиринт",
-                desc: "поворачивай зеркала",
-                type: "mirrors"
-            },
-            {
-                id: 10,
-                title: "🔬 настрой микроскоп",
-                desc: "покрути линзы до чёткости",
-                type: "focus"
-            },
-            {
-                id: 11,
-                title: "⚠️ полное отражение",
-                desc: "выбери правильные углы",
-                type: "critical"
-            },
-            {
-                id: 12,
-                title: "🔐 секретный код",
-                desc: "расшифруй: 1.33 1.5 2.4 1.33",
-                type: "code"
-            },
-            {
-                id: 13,
-                title: "🧮 калькулятор",
-                desc: "воздух→вода, α=45°, найди β",
-                type: "calc"
-            },
-            {
-                id: 14,
-                title: "✏️ нарисуй луч",
-                desc: "нарисуй пальцем, как пойдёт луч",
-                type: "draw"
-            },
-            {
-                id: 15,
-                title: "📊 плотность сред",
-                desc: "расположи по увеличению плотности",
-                type: "sort"
-            },
-            {
-                id: 16,
-                title: "❌ найди ошибку",
-                desc: "в формуле n₁·sinβ = n₂·sinα",
-                type: "error"
-            },
-            {
-                id: 17,
-                title: "⚡ эксперимент",
-                desc: "найди угол полного отражения",
-                type: "experiment"
-            },
-            {
-                id: 18,
-                title: "🏰 спаси принцессу",
-                desc: "проведи луч через 5 сред к замку",
-                type: "quest"
-            },
-            {
-                id: 19,
-                title: "🔭 собери телескоп",
-                desc: "расположи линзы правильно",
-                type: "lens"
-            },
-            {
-                id: 20,
-                title: "🌅 почему закат красный?",
-                desc: "собери объяснение из слов",
-                type: "explain"
-            }
-        ];
-
-        // ===== ОТОБРАЖЕНИЕ ЗАДАНИЙ =====
+        // ===== СЕТКА ЗАДАНИЙ =====
         function renderTasksGrid() {
             let html = '';
             for (let i = 0; i < TASKS.length; i++) {
@@ -801,14 +822,13 @@
                 html += `
                     <div class="task-item ${isAnswered ? 'completed' : ''}" onclick="openTask(${i})">
                         <div class="task-number">${taskNum}</div>
-                        <div class="task-check">${isAnswered ? '✓' : '🌾'}</div>
+                        <div class="task-check">${isAnswered ? '✓' : '○'}</div>
                     </div>
                 `;
             }
             tasksGrid.innerHTML = html;
             
-            const answeredCount = Object.keys(playerAnswers).length;
-            if (answeredCount === 20) {
+            if (Object.keys(playerAnswers).length === 20) {
                 sendBtn.classList.add('active');
             }
         }
@@ -819,102 +839,129 @@
             const task = TASKS[index];
             const taskNum = index + 1;
             
-            let content = '<div class="options-grid">';
+            let optionsHtml = '<div class="options-grid">';
+            task.options.forEach((opt, i) => {
+                const selected = playerAnswers[taskNum] === i ? 'selected' : '';
+                optionsHtml += `<div class="option-btn ${selected}" onclick="selectAnswer(${i})">${opt}</div>`;
+            });
+            optionsHtml += '</div>';
             
-            if (task.type === 'choose' && task.options) {
-                task.options.forEach((opt, i) => {
-                    content += `<div class="option-row" onclick="selectOption(${i})">${opt}</div>`;
-                });
-            } else {
-                content += '<div style="padding:30px; text-align:center; color:#ffd89c;">👆 выполни задание</div>';
-            }
-            
-            content += '</div>';
-            
-            document.getElementById('taskDetailContent').innerHTML = `
-                <div style="font-size: 1.2rem; color: #ffd89c; margin-bottom: 10px;">задание ${taskNum}/20</div>
-                <div class="task-question">${task.title}</div>
-                <div style="color: #e5c7a2; margin-bottom: 20px;">${task.desc}</div>
-                ${content}
+            document.getElementById('taskContent').innerHTML = `
+                <div class="task-title">задание ${taskNum}/20</div>
+                <div class="task-title">${task.title}</div>
+                <div class="task-desc">${task.desc}</div>
+                ${optionsHtml}
             `;
             
             tasksScreen.classList.add('hidden');
             taskDetailScreen.classList.remove('hidden');
         }
 
-        // ===== ВЫБОР ОТВЕТА =====
-        function selectOption(index) {
-            document.querySelectorAll('.option-row').forEach(el => el.classList.remove('selected'));
+        // ===== ВЫБРАТЬ ОТВЕТ =====
+        function selectAnswer(answerIndex) {
+            const taskNum = currentTaskIndex + 1;
+            const task = TASKS[currentTaskIndex];
+            
+            // Визуально отмечаем
+            document.querySelectorAll('.option-btn').forEach(btn => btn.classList.remove('selected'));
             event.currentTarget.classList.add('selected');
             
-            const taskNum = currentTaskIndex + 1;
-            playerAnswers[taskNum] = index;
+            // Сохраняем ответ
+            playerAnswers[taskNum] = answerIndex;
+            
+            // Проверяем правильность (для статистики)
+            const isCorrect = (answerIndex === task.correct);
             
             // Сохраняем в Firebase
-            db.ref(`games/${currentGameId}/players/${playerName}/answers/${taskNum}`).set(index);
-            
-            const progress = Math.round((Object.keys(playerAnswers).length / 20) * 100);
-            db.ref(`games/${currentGameId}/players/${playerName}`).update({
-                progress: progress
+            db.ref(`games/${currentGameId}/players/${playerName}/answers/${taskNum}`).set({
+                answer: answerIndex,
+                correct: isCorrect
             });
+            
+            // Обновляем прогресс
+            const progress = Math.round((Object.keys(playerAnswers).length / 20) * 100);
+            db.ref(`games/${currentGameId}/players/${playerName}/progress`).set(progress);
             
             renderTasksGrid();
             
             // Возвращаемся к списку
-            setTimeout(() => backToTasks(), 500);
+            setTimeout(backToTasks, 400);
         }
 
-        // ===== НАЗАД К СПИСКУ =====
+        // ===== НАЗАД =====
         function backToTasks() {
             taskDetailScreen.classList.add('hidden');
             tasksScreen.classList.remove('hidden');
         }
 
-        // ===== ПОКАЗАТЬ РЕЗУЛЬТАТЫ =====
-        function showResults() {
+        // ===== ЗАВЕРШИТЬ =====
+        function finishGame() {
             if (Object.keys(playerAnswers).length < 20) {
                 alert('нужно выполнить все 20 заданий');
                 return;
             }
             
-            // Подсчёт баллов (упрощённо)
-            playerScore = 200;
+            // Подсчёт очков
+            let score = 0;
+            for (let i = 0; i < TASKS.length; i++) {
+                const taskNum = i + 1;
+                if (playerAnswers[taskNum] === TASKS[i].correct) {
+                    score += 5;
+                }
+            }
             
             tasksScreen.classList.add('hidden');
             resultScreen.classList.remove('hidden');
             
-            document.getElementById('finalScore').textContent = `${playerScore} ✨`;
+            document.getElementById('finalScore').textContent = `${score} ✨`;
+            document.getElementById('resultMessage').textContent = `правильно: ${score/5}/${TASKS.length}`;
             
             // Сохраняем результат
             db.ref(`games/${currentGameId}/players/${playerName}`).update({
-                score: playerScore,
+                score: score,
                 finishedAt: Date.now()
             });
             
-            // Показываем простой результат
-            document.getElementById('resultDetails').innerHTML = 'ты выполнил все задания!';
+            // Показываем лидерборд
+            showLeaderboard();
         }
 
         // ===== ЛИДЕРБОРД =====
-        function showFinalLeaderboard(players) {
+        function showLeaderboard() {
+            db.ref(`games/${currentGameId}/players`).once('value', (snapshot) => {
+                const players = snapshot.val() || {};
+                const sorted = Object.entries(players)
+                    .filter(([_, d]) => d.score)
+                    .sort((a, b) => b[1].score - a[1].score)
+                    .slice(0, 5);
+                
+                let html = '<div style="margin: 20px 0;"><h3>🏆 лидеры</h3>';
+                sorted.forEach(([name, data], i) => {
+                    html += `
+                        <div class="leaderboard-item">
+                            <span>${i+1}. ${name}</span>
+                            <span>✨ ${data.score}</span>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                document.getElementById('finalLeaderboard').innerHTML = html;
+            });
+        }
+
+        // ===== ОБНОВЛЕНИЕ ИГРОКОВ =====
+        function updatePlayersList(players) {
+            const list = document.getElementById('playersList');
+            const count = document.getElementById('playerCount');
+            
             if (!players) return;
             
-            const sorted = Object.entries(players)
-                .filter(([_, d]) => d.score)
-                .sort((a, b) => b[1].score - a[1].score)
-                .slice(0, 5);
+            const names = Object.keys(players);
+            count.textContent = names.length;
             
-            let html = '<h3 style="color:#ffd89c;">лидеры</h3>';
-            sorted.forEach(([name, data], i) => {
-                html += `
-                    <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,180,80,0.2);">
-                        <span>${i+1}. ${name}</span>
-                        <span>✨ ${data.score}</span>
-                    </div>
-                `;
-            });
-            
-            document.getElementById('leaderboardList').innerHTML = html;
+            list.innerHTML = names.map(name => 
+                `<span class="player-badge">👤 ${name}</span>`
+            ).join('');
         }
 
         // ===== ВЫХОД =====
@@ -925,18 +972,6 @@
         // ===== ФОРМАТ КОДА =====
         document.getElementById('gameCode').addEventListener('input', function() {
             this.value = this.value.replace(/\D/g, '').substring(0, 6);
-        });
-        
-        document.getElementById('playerName').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                document.getElementById('gameCode').focus();
-            }
-        });
-        
-        document.getElementById('gameCode').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                joinGame();
-            }
         });
     </script>
 </body>
