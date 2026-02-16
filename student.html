@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🌅 ученик · преломление</title>
+    
+    <!-- Firebase SDK (ВАЖНО: ПОДКЛЮЧАЕМ ДО ВСЕГО) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Наш конфиг -->
+    <script src="firebase-config.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -190,6 +198,7 @@
             background: rgba(0,0,0,0.3);
             border-radius: 20px;
             padding: 8px 16px;
+            color: #ffd89c;
         }
 
         .timer {
@@ -347,11 +356,15 @@
         </div>
     </div>
 
-    <script src="firebase-config.js"></script>
     <script>
         // ============================================
-        // 20 ЗАДАНИЙ
+        // student.js
         // ============================================
+
+        // Проверяем Firebase
+        if (typeof db === 'undefined') {
+            console.error('❌ Firebase не загружен!');
+        }
 
         const TASKS = [
             { // 1
@@ -491,6 +504,11 @@
 
         // ===== ВХОД =====
         function joinGame() {
+            if (typeof db === 'undefined') {
+                document.getElementById('joinError').textContent = '❌ Ошибка подключения';
+                return;
+            }
+
             const name = document.getElementById('playerName').value.trim();
             const code = document.getElementById('gameCode').value.trim();
 
@@ -533,6 +551,9 @@
 
                 // Слушаем игру
                 listenToGame();
+            }).catch(error => {
+                console.error('❌ Ошибка:', error);
+                document.getElementById('joinError').textContent = '❌ ошибка подключения';
             });
         }
 
