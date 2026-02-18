@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👨‍🏫 учитель · интерактив</title>
+    <title>👨‍🏫 учитель · тест 30 вопросов</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="firebase-config.js"></script>
@@ -32,7 +32,7 @@
         .panel {
             background: rgba(20, 12, 5, 0.95);
             backdrop-filter: blur(10px);
-            border-radius: 30px;
+            border-radius: 40px;
             padding: 25px;
             border: 2px solid #b45f1b;
         }
@@ -122,22 +122,20 @@
 </head>
 <body>
     <div class="dashboard">
-        <!-- Левая панель -->
         <div class="panel">
             <h1>👨‍🏫 учитель</h1>
-            <button class="btn" onclick="createGame()">🎮 создать игру</button>
+            <button class="btn" onclick="createGame()">➕ создать тест</button>
 
             <div id="gamePanel" class="hidden">
                 <div class="code-box">
-                    <div style="color: #b45f1b;">код игры</div>
+                    <div style="color: #b45f1b;">код теста</div>
                     <div class="code" id="gameCode">000000</div>
                 </div>
 
-                <div class="timer" id="timer">20:00</div>
+                <div class="timer" id="timer">15:00</div>
 
                 <div class="controls">
                     <button class="btn" onclick="startGame()">▶ старт</button>
-                    <button class="btn" onclick="pauseGame()">⏸ пауза</button>
                     <button class="btn" onclick="endGame()">⏹ финиш</button>
                 </div>
 
@@ -146,11 +144,10 @@
             </div>
 
             <div id="noGame" style="text-align: center; color: #b45f1b; padding: 40px;">
-                🌅 создай игру чтобы начать
+                🌅 создай тест чтобы начать
             </div>
         </div>
 
-        <!-- Правая панель -->
         <div class="panel">
             <h1>🏆 лидеры</h1>
             <div id="leaderboard"></div>
@@ -159,112 +156,104 @@
     </div>
 
     <script>
-        let currentGameId = null;
-        let timerInterval = null;
+        let gameId = null;
 
         function createGame() {
             const code = Math.floor(100000 + Math.random() * 900000).toString();
-            currentGameId = `game_${code}`;
+            gameId = `game_${code}`;
 
-            db.ref(`games/${currentGameId}`).set({
-                id: currentGameId,
+            db.ref(`games/${gameId}`).set({
                 status: 'waiting',
                 startTime: null,
-                timeLimit: 1200,
                 players: {}
             }).then(() => {
                 document.getElementById('noGame').classList.add('hidden');
                 document.getElementById('gamePanel').classList.remove('hidden');
-                document.getElementById('gameCode').textContent = code;
+                document.getElementById('gameCode').innerText = code;
                 listenToGame();
             });
         }
 
         function listenToGame() {
-            db.ref(`games/${currentGameId}`).on('value', (snap) => {
-                const game = snap.val();
-                if (!game) return;
+            db.ref(`games/${gameId}`).on('value', (snap) => {
+                const data = snap.val();
+                if (!data) return;
 
-                updatePlayers(game.players);
-                updateLeaderboard(game.players);
+                // Список учеников
+                if (data.players) {
+                    let html = '';
+                    for (let [name, player] of Object.entries(data.players)) {
+                        const progress = player.progress || 0;
+                        const percent = (progress / 30) * 100;
+                        html += `
+                            <div class="student-card">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>👤 ${name}</span>
+                                    <span>${progress}/30</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${percent}%"></div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    document.getElementById('studentsList').innerHTML = html || '<div style="color:#b45f1b;">ждём учеников...</div>';
+                }
 
-                if (game.status === 'active' && game.startTime) {
-                    updateTimer(game.timeLimit, game.startTime);
+                // Лидерборд
+                if (data.players) {
+                    const sorted = Object.entries(data.players)
+                        .filter(([_, p]) => p.score !== undefined)
+                        .sort((a, b) => b[1].score - a[1].score)
+                        .slice(0, 5);
+
+                    let lbHtml = '';
+                    sorted.forEach(([name, p], i) => {
+                        lbHtml += `
+                            <div class="leaderboard-item">
+                                <span>${i+1}. ${name}</span>
+                                <span>${p.score} ✨</span>
+                            </div>
+                        `;
+                    });
+                    document.getElementById('leaderboard').innerHTML = lbHtml || '<div style="color:#b45f1b;">пока нет результатов</div>';
+
+                    // Статистика
+                    const total = Object.keys(data.players).length;
+                    const completed = Object.values(data.players).filter(p => p.progress === 30).length;
+                    document.getElementById('stats').innerHTML = `
+                        <div>👥 всего: ${total}</div>
+                        <div>✅ завершили: ${completed}</div>
+                    `;
+                }
+
+                // Таймер
+                if (data.status === 'active' && data.startTime) {
+                    updateTimer(data.startTime);
                 }
             });
         }
 
-        function updatePlayers(players) {
-            const list = document.getElementById('studentsList');
-            if (!players) {
-                list.innerHTML = '<div style="color: #b45f1b;">ждём учеников...</div>';
-                return;
-            }
-
-            list.innerHTML = Object.entries(players).map(([name, data]) => `
-                <div class="student-card">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>👤 ${name}</span>
-                        <span>задание ${data.task || 1}/10</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${((data.task || 1)-1)*10}%"></div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updateLeaderboard(players) {
-            if (!players) return;
-
-            const sorted = Object.entries(players)
-                .sort((a, b) => (b[1].task || 1) - (a[1].task || 1))
-                .slice(0, 5);
-
-            document.getElementById('leaderboard').innerHTML = sorted.map(([name, data], i) => `
-                <div class="leaderboard-item">
-                    <span>${i+1}. ${name}</span>
-                    <span>задание ${data.task || 1}</span>
-                </div>
-            `).join('');
-
-            const total = Object.keys(players).length;
-            const avg = Object.values(players).reduce((acc, p) => acc + (p.task || 1), 0) / total || 0;
-            document.getElementById('stats').innerHTML = `
-                <div>👥 всего: ${total}</div>
-                <div>📊 среднее: задание ${avg.toFixed(1)}</div>
-            `;
-        }
-
-        function updateTimer(limit, start) {
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - start) / 1000);
-                const remaining = Math.max(0, limit - elapsed);
-                const mins = Math.floor(remaining / 60);
-                const secs = remaining % 60;
-                document.getElementById('timer').textContent = 
-                    `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+        function updateTimer(startTime) {
+            setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const left = Math.max(0, 900 - elapsed);
+                const m = Math.floor(left / 60);
+                const s = left % 60;
+                document.getElementById('timer').innerText = 
+                    `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
             }, 1000);
         }
 
         function startGame() {
-            if (!currentGameId) return;
-            db.ref(`games/${currentGameId}`).update({
+            db.ref(`games/${gameId}`).update({
                 status: 'active',
                 startTime: Date.now()
             });
         }
 
-        function pauseGame() {
-            if (!currentGameId) return;
-            db.ref(`games/${currentGameId}`).update({ status: 'paused' });
-        }
-
         function endGame() {
-            if (!currentGameId) return;
-            db.ref(`games/${currentGameId}`).update({ status: 'finished' });
-            clearInterval(timerInterval);
+            db.ref(`games/${gameId}`).update({ status: 'finished' });
         }
     </script>
 </body>
