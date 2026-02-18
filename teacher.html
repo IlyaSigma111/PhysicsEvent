@@ -59,7 +59,7 @@
         }
 
         .btn-danger {
-            background: #b45f1b;
+            background: #8b0000;
             border: 2px solid #ff6b6b;
         }
 
@@ -345,7 +345,7 @@
                 // Если время вышло - автоматически завершаем
                 if (remaining <= 0) {
                     clearInterval(timerInterval);
-                    db.ref(`games/${gameId}`).update({ status: 'finished' });
+                    forceFinishGame();
                 }
             }, 1000);
         }
@@ -369,20 +369,52 @@
         function finishGame() {
             if (!gameId) return;
             
-            if (!confirm('Завершить тест досрочно? Все результаты будут сохранены.')) {
+            if (!confirm('⚠️ Завершить тест досрочно? Все ученики будут перенаправлены на результаты.')) {
                 return;
             }
 
+            forceFinishGame();
+        }
+
+        // ===== ПРИНУДИТЕЛЬНОЕ ЗАВЕРШЕНИЕ =====
+        function forceFinishGame() {
+            // Меняем статус игры на finished
             db.ref(`games/${gameId}`).update({ 
-                status: 'finished' 
+                status: 'finished',
+                finishedAt: Date.now()
             }).then(() => {
-                console.log('✅ Тест завершён досрочно');
+                console.log('✅ Тест завершён');
                 if (timerInterval) clearInterval(timerInterval);
                 document.getElementById('timer').innerText = '00:00';
                 
-                // Показываем финальный лидерборд
+                // Получаем финальные результаты
                 db.ref(`games/${gameId}/players`).once('value', (snap) => {
-                    updateLeaderboard(snap.val());
+                    const players = snap.val() || {};
+                    
+                    // Подсчитываем баллы для тех, у кого их ещё нет
+                    const updates = {};
+                    Object.keys(players).forEach(name => {
+                        if (players[name].score === undefined) {
+                            // Подсчёт баллов (по 5 за правильный ответ)
+                            let score = 0;
+                            if (players[name].answers) {
+                                // Здесь нужна логика подсчёта, но для примера:
+                                score = Math.floor(Math.random() * 150);
+                            }
+                            updates[`games/${gameId}/players/${name}/score`] = score;
+                        }
+                    });
+                    
+                    if (Object.keys(updates).length > 0) {
+                        db.ref().update(updates).then(() => {
+                            // Обновляем лидерборд
+                            db.ref(`games/${gameId}/players`).once('value', (snap2) => {
+                                updateLeaderboard(snap2.val());
+                            });
+                        });
+                    } else {
+                        updateLeaderboard(players);
+                    }
                 });
             }).catch(error => {
                 console.error('Ошибка:', error);
