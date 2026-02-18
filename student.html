@@ -44,6 +44,12 @@
             font-size: 80px;
             margin: 10px 0;
             filter: drop-shadow(0 0 30px #ff9900);
+            animation: float 3s infinite alternate;
+        }
+
+        @keyframes float {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
         }
 
         h1 {
@@ -80,6 +86,11 @@
             font-weight: bold;
             margin: 8px 0;
             cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
         }
 
         .hidden {
@@ -97,6 +108,11 @@
             color: #ffd966;
             letter-spacing: 8px;
             margin: 30px 0;
+        }
+
+        .players-list {
+            color: #ffd89c;
+            margin: 20px 0;
         }
 
         /* ИГРА */
@@ -148,6 +164,11 @@
             font-size: 1.2rem;
             color: #ffd89c;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .q-btn:active {
+            transform: scale(0.95);
         }
 
         .q-btn.answered {
@@ -190,6 +211,10 @@
             color: white;
             cursor: pointer;
             transition: all 0.2s;
+        }
+
+        .option:active {
+            transform: scale(0.98);
         }
 
         .option.selected {
@@ -243,6 +268,10 @@
             border-bottom: 1px solid #b45f1b;
             color: #ffd89c;
         }
+
+        .rank-1 { color: gold; }
+        .rank-2 { color: silver; }
+        .rank-3 { color: #cd7f32; }
     </style>
 </head>
 <body>
@@ -262,7 +291,7 @@
         <div id="wait" class="waiting hidden">
             <div class="sun">⏳</div>
             <div class="code" id="showCode">000000</div>
-            <div id="playersCount">0 игроков</div>
+            <div class="players-list" id="playersCount">0 игроков</div>
         </div>
 
         <!-- ТЕСТ -->
@@ -325,22 +354,12 @@
             },
             {
                 q: "Что такое показатель преломления?",
-                opts: [
-                    "отношение скоростей света",
-                    "угол падения",
-                    "длина волны",
-                    "частота света"
-                ],
+                opts: ["отношение скоростей света", "угол падения", "длина волны", "частота света"],
                 correct: 0
             },
             {
                 q: "Формула закона преломления:",
-                opts: [
-                    "n₁·sinα = n₂·sinβ",
-                    "n₁·sinβ = n₂·sinα",
-                    "sinα/n₁ = sinβ/n₂",
-                    "n₁·cosα = n₂·cosβ"
-                ],
+                opts: ["n₁·sinα = n₂·sinβ", "n₁·sinβ = n₂·sinα", "sinα/n₁ = sinβ/n₂", "n₁·cosα = n₂·cosβ"],
                 correct: 0
             },
             {
@@ -365,12 +384,7 @@
             },
             {
                 q: "Явление полного внутреннего отражения возможно при переходе...",
-                opts: [
-                    "из воды в воздух",
-                    "из воздуха в воду",
-                    "из стекла в воду",
-                    "всегда"
-                ],
+                opts: ["из воды в воздух", "из воздуха в воду", "из стекла в воду", "всегда"],
                 correct: 0
             },
             {
@@ -390,12 +404,7 @@
             },
             {
                 q: "Почему ложка в стакане с водой кажется сломанной?",
-                opts: [
-                    "вода нагревается",
-                    "свет преломляется",
-                    "стекло искажает",
-                    "так кажется"
-                ],
+                opts: ["вода нагревается", "свет преломляется", "стекло искажает", "так кажется"],
                 correct: 1
             },
             {
@@ -420,12 +429,7 @@
             },
             {
                 q: "Что такое критический угол?",
-                opts: [
-                    "угол, при котором начинается полное отражение",
-                    "угол падения",
-                    "угол преломления",
-                    "угол отражения"
-                ],
+                opts: ["угол, при котором начинается полное отражение", "угол падения", "угол преломления", "угол отражения"],
                 correct: 0
             },
             {
@@ -460,12 +464,7 @@
             },
             {
                 q: "Почему небо на закате красное?",
-                opts: [
-                    "красный свет меньше рассеивается",
-                    "солнце становится красным",
-                    "воздух краснеет",
-                    "облака отражают"
-                ],
+                opts: ["красный свет меньше рассеивается", "солнце становится красным", "воздух краснеет", "облака отражают"],
                 correct: 0
             },
             {
@@ -480,22 +479,12 @@
             },
             {
                 q: "Закон обратимости световых лучей гласит:",
-                opts: [
-                    "путь луча обратим",
-                    "луч нельзя обратить",
-                    "только в вакууме",
-                    "только в воде"
-                ],
+                opts: ["путь луча обратим", "луч нельзя обратить", "только в вакууме", "только в воде"],
                 correct: 0
             },
             {
                 q: "Если синус угла преломления больше 1, то...",
-                opts: [
-                    "наблюдается полное отражение",
-                    "луч идёт прямо",
-                    "формула неверна",
-                    "такое невозможно"
-                ],
+                opts: ["наблюдается полное отражение", "луч идёт прямо", "формула неверна", "такое невозможно"],
                 correct: 0
             }
         ];
@@ -505,6 +494,7 @@
         let myName = null;
         let answers = {}; // { номер_вопроса: индекс_ответа }
         let currentQuestion = null;
+        let timerInterval = null;
 
         // DOM
         const lobby = document.getElementById('lobby');
@@ -532,6 +522,7 @@
             lobby.classList.add('hidden');
             wait.classList.remove('hidden');
 
+            // Проверяем существование игры
             db.ref(`games/${gameId}`).once('value', (snap) => {
                 const data = snap.val();
                 if (!data) {
@@ -541,58 +532,99 @@
                     return;
                 }
 
-                // Регистрация
+                // Регистрация игрока
                 db.ref(`games/${gameId}/players/${name}`).set({
                     name: name,
+                    joinedAt: Date.now(),
                     answers: {},
                     progress: 0
                 });
 
+                // Слушаем изменения
                 listenToGame();
+            }).catch(error => {
+                console.error('Ошибка:', error);
+                showError('❌ ошибка подключения');
             });
         }
 
+        // ===== СЛУШАТЬ ИЗМЕНЕНИЯ =====
         function listenToGame() {
             db.ref(`games/${gameId}`).on('value', (snap) => {
                 const data = snap.val();
                 if (!data) return;
 
-                // Список игроков
+                // Обновляем список игроков в ожидании
                 if (data.players) {
                     const count = Object.keys(data.players).length;
                     document.getElementById('playersCount').innerText = count + ' игроков';
                 }
 
-                // Старт теста
+                // ===== ЕСЛИ ТЕСТ ЗАВЕРШЁН УЧИТЕЛЕМ =====
+                if (data.status === 'finished') {
+                    // Принудительно показываем результаты
+                    game.classList.add('hidden');
+                    result.classList.remove('hidden');
+                    
+                    // Подсчитываем баллы
+                    let score = 0;
+                    for (let i = 1; i <= 30; i++) {
+                        if (answers[i] !== undefined && answers[i] === QUESTIONS[i - 1].correct) {
+                            score += 5;
+                        }
+                    }
+                    
+                    document.getElementById('finalScore').innerText = score + ' ✨';
+                    
+                    // Показываем лидерборд
+                    showLeaderboard();
+                    
+                    // Останавливаем таймер
+                    if (timerInterval) clearInterval(timerInterval);
+                    return;
+                }
+
+                // ===== СТАРТ ТЕСТА =====
                 if (data.status === 'active') {
                     wait.classList.add('hidden');
                     game.classList.remove('hidden');
 
-                    // Загружаем мои ответы
+                    // Загружаем мои ответы из Firebase
                     if (data.players && data.players[myName]) {
                         answers = data.players[myName].answers || {};
                     }
                     renderQuestionsGrid();
-                }
 
-                // Таймер (15 мин = 900 сек)
-                if (data.status === 'active' && data.startTime) {
-                    updateTimer(900, data.startTime);
+                    // Запускаем таймер
+                    if (data.startTime) {
+                        updateTimer(data.startTime, data.timeLimit || 900);
+                    }
                 }
             });
         }
 
-        function updateTimer(limit, startTime) {
-            setInterval(() => {
+        // ===== ТАЙМЕР =====
+        function updateTimer(startTime, timeLimit) {
+            if (timerInterval) clearInterval(timerInterval);
+
+            timerInterval = setInterval(() => {
                 const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const remaining = Math.max(0, limit - elapsed);
+                const remaining = Math.max(0, timeLimit - elapsed);
                 const mins = Math.floor(remaining / 60);
                 const secs = remaining % 60;
+                
                 document.getElementById('timer').innerText = 
                     `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+                // Если время вышло
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    sendResults(); // автоматически завершаем
+                }
             }, 1000);
         }
 
+        // ===== ОТОБРАЗИТЬ СЕТКУ ВОПРОСОВ =====
         function renderQuestionsGrid() {
             let html = '';
             for (let i = 1; i <= 30; i++) {
@@ -613,6 +645,7 @@
             }
         }
 
+        // ===== ОТКРЫТЬ ВОПРОС =====
         function openQuestion(num) {
             currentQuestion = num;
             const q = QUESTIONS[num - 1];
@@ -629,24 +662,32 @@
             questionCard.classList.remove('hidden');
         }
 
+        // ===== ВЫБРАТЬ ОТВЕТ =====
         function selectAnswer(idx) {
+            // Визуальное выделение
             document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
             event.target.classList.add('selected');
 
+            // Сохраняем ответ
             answers[currentQuestion] = idx;
 
             // Сохраняем в Firebase
             db.ref(`games/${gameId}/players/${myName}/answers/${currentQuestion}`).set(idx);
             db.ref(`games/${gameId}/players/${myName}/progress`).set(Object.keys(answers).length);
 
+            // Обновляем сетку
             renderQuestionsGrid();
+            
+            // Закрываем вопрос
             closeQuestion();
         }
 
+        // ===== ЗАКРЫТЬ ВОПРОС =====
         function closeQuestion() {
             questionCard.classList.add('hidden');
         }
 
+        // ===== ОТПРАВИТЬ РЕЗУЛЬТАТЫ =====
         function sendResults() {
             if (Object.keys(answers).length < 30) {
                 alert('нужно ответить на все 30 вопросов');
@@ -657,35 +698,45 @@
             let score = 0;
             for (let i = 1; i <= 30; i++) {
                 if (answers[i] === QUESTIONS[i - 1].correct) {
-                    score += 5; // 5 баллов за правильный ответ
+                    score += 5;
                 }
             }
 
+            // Сохраняем результат в Firebase
+            db.ref(`games/${gameId}/players/${myName}/score`).set(score);
+
+            // Показываем результаты
             game.classList.add('hidden');
             result.classList.remove('hidden');
             document.getElementById('finalScore').innerText = score + ' ✨';
 
-            // Сохраняем результат
-            db.ref(`games/${gameId}/players/${myName}/score`).set(score);
-
-            // Лидерборд
+            // Показываем лидерборд
             showLeaderboard();
         }
 
+        // ===== ПОКАЗАТЬ ЛИДЕРБОРД =====
         function showLeaderboard() {
             db.ref(`games/${gameId}/players`).once('value', (snap) => {
                 const players = snap.val() || {};
-                const sorted = Object.entries(players)
-                    .filter(([_, d]) => d.score !== undefined)
+                
+                // Фильтруем только тех, у кого есть очки
+                const withScores = Object.entries(players)
+                    .filter(([_, p]) => p.score !== undefined)
                     .sort((a, b) => b[1].score - a[1].score)
-                    .slice(0, 5);
+                    .slice(0, 10);
+
+                if (withScores.length === 0) {
+                    document.getElementById('finalLeaderboard').innerHTML = '<div style="color:#b45f1b;">пока нет результатов</div>';
+                    return;
+                }
 
                 let html = '<h3 style="color:#ffd89c; margin:20px 0;">🏆 лидеры</h3>';
-                sorted.forEach(([name, data], i) => {
+                withScores.forEach(([name, player], index) => {
+                    const rankClass = index === 0 ? 'rank-1' : (index === 1 ? 'rank-2' : (index === 2 ? 'rank-3' : ''));
                     html += `
                         <div class="leaderboard-item">
-                            <span>${i + 1}. ${name}</span>
-                            <span>${data.score} ✨</span>
+                            <span class="${rankClass}">${index + 1}. ${name}</span>
+                            <span>${player.score} ✨</span>
                         </div>
                     `;
                 });
@@ -693,15 +744,17 @@
             });
         }
 
+        // ===== ПОКАЗАТЬ ОШИБКУ =====
         function showError(msg) {
             document.getElementById('error').innerText = msg;
         }
 
+        // ===== ВЫХОД =====
         function exit() {
             location.reload();
         }
 
-        // Формат кода
+        // ===== ФОРМАТ КОДА =====
         document.getElementById('code').addEventListener('input', function() {
             this.value = this.value.replace(/\D/g, '').substring(0, 6);
         });
