@@ -51,6 +51,16 @@
             font-size: 1.2rem;
             cursor: pointer;
             margin: 5px;
+            transition: transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-danger {
+            background: #b45f1b;
+            border: 2px solid #ff6b6b;
         }
 
         .code-box {
@@ -79,7 +89,7 @@
 
         .controls {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin: 20px 0;
         }
@@ -110,18 +120,45 @@
         .leaderboard-item {
             display: flex;
             justify-content: space-between;
-            padding: 10px;
+            padding: 12px;
             border-bottom: 1px solid #b45f1b;
             color: #ffd89c;
+            font-size: 1.1rem;
+        }
+
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+
+        .rank-1 { color: gold; }
+        .rank-2 { color: silver; }
+        .rank-3 { color: #cd7f32; }
+
+        .stats {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #b45f1b;
+            color: #ffd89c;
+        }
+
+        .stats div {
+            margin: 8px 0;
         }
 
         .hidden {
             display: none;
         }
+
+        .empty {
+            text-align: center;
+            color: #b45f1b;
+            padding: 40px;
+        }
     </style>
 </head>
 <body>
     <div class="dashboard">
+        <!-- Левая панель - управление -->
         <div class="panel">
             <h1>👨‍🏫 учитель</h1>
             <button class="btn" onclick="createGame()">➕ создать тест</button>
@@ -136,28 +173,38 @@
 
                 <div class="controls">
                     <button class="btn" onclick="startGame()">▶ старт</button>
-                    <button class="btn" onclick="endGame()">⏹ финиш</button>
+                    <button class="btn btn-danger" onclick="finishGame()">⏹ финиш</button>
                 </div>
 
-                <h2>👥 ученики</h2>
+                <h2>👥 ученики (<span id="studentsCount">0</span>)</h2>
                 <div id="studentsList"></div>
             </div>
 
-            <div id="noGame" style="text-align: center; color: #b45f1b; padding: 40px;">
+            <div id="noGame" class="empty">
                 🌅 создай тест чтобы начать
             </div>
         </div>
 
+        <!-- Правая панель - лидерборд -->
         <div class="panel">
-            <h1>🏆 лидеры</h1>
-            <div id="leaderboard"></div>
-            <div style="margin-top: 20px; color: #ffd89c;" id="stats"></div>
+            <h1>🏆 лидерборд</h1>
+            <div id="leaderboard">
+                <div class="empty">пока нет результатов</div>
+            </div>
+            
+            <div class="stats" id="stats">
+                <div>👥 всего: <span id="totalCount">0</span></div>
+                <div>✅ завершили: <span id="completedCount">0</span></div>
+                <div>📊 средний балл: <span id="avgScore">0</span></div>
+            </div>
         </div>
     </div>
 
     <script>
         let gameId = null;
+        let timerInterval = null;
 
+        // ===== СОЗДАТЬ ТЕСТ =====
         function createGame() {
             const code = Math.floor(100000 + Math.random() * 900000).toString();
             gameId = `game_${code}`;
@@ -165,95 +212,182 @@
             db.ref(`games/${gameId}`).set({
                 status: 'waiting',
                 startTime: null,
+                timeLimit: 900, // 15 минут
                 players: {}
             }).then(() => {
                 document.getElementById('noGame').classList.add('hidden');
                 document.getElementById('gamePanel').classList.remove('hidden');
                 document.getElementById('gameCode').innerText = code;
                 listenToGame();
+            }).catch(error => {
+                console.error('Ошибка:', error);
+                alert('Ошибка создания теста');
             });
         }
 
+        // ===== СЛУШАТЬ ИЗМЕНЕНИЯ =====
         function listenToGame() {
             db.ref(`games/${gameId}`).on('value', (snap) => {
                 const data = snap.val();
                 if (!data) return;
 
-                // Список учеников
-                if (data.players) {
-                    let html = '';
-                    for (let [name, player] of Object.entries(data.players)) {
-                        const progress = player.progress || 0;
-                        const percent = (progress / 30) * 100;
-                        html += `
-                            <div class="student-card">
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span>👤 ${name}</span>
-                                    <span>${progress}/30</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: ${percent}%"></div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    document.getElementById('studentsList').innerHTML = html || '<div style="color:#b45f1b;">ждём учеников...</div>';
-                }
+                // Обновляем список учеников
+                updateStudentsList(data.players);
+                
+                // Обновляем лидерборд
+                updateLeaderboard(data.players);
 
-                // Лидерборд
-                if (data.players) {
-                    const sorted = Object.entries(data.players)
-                        .filter(([_, p]) => p.score !== undefined)
-                        .sort((a, b) => b[1].score - a[1].score)
-                        .slice(0, 5);
-
-                    let lbHtml = '';
-                    sorted.forEach(([name, p], i) => {
-                        lbHtml += `
-                            <div class="leaderboard-item">
-                                <span>${i+1}. ${name}</span>
-                                <span>${p.score} ✨</span>
-                            </div>
-                        `;
-                    });
-                    document.getElementById('leaderboard').innerHTML = lbHtml || '<div style="color:#b45f1b;">пока нет результатов</div>';
-
-                    // Статистика
-                    const total = Object.keys(data.players).length;
-                    const completed = Object.values(data.players).filter(p => p.progress === 30).length;
-                    document.getElementById('stats').innerHTML = `
-                        <div>👥 всего: ${total}</div>
-                        <div>✅ завершили: ${completed}</div>
-                    `;
-                }
-
-                // Таймер
+                // Обновляем таймер
                 if (data.status === 'active' && data.startTime) {
-                    updateTimer(data.startTime);
+                    updateTimer(data.startTime, data.timeLimit);
+                } else if (data.status === 'finished') {
+                    if (timerInterval) clearInterval(timerInterval);
+                    document.getElementById('timer').innerText = '00:00';
                 }
             });
         }
 
-        function updateTimer(startTime) {
-            setInterval(() => {
+        // ===== ОБНОВИТЬ СПИСОК УЧЕНИКОВ =====
+        function updateStudentsList(players) {
+            const list = document.getElementById('studentsList');
+            const count = document.getElementById('studentsCount');
+            
+            if (!players || Object.keys(players).length === 0) {
+                list.innerHTML = '<div style="color:#b45f1b;">ждём учеников...</div>';
+                count.innerText = '0';
+                return;
+            }
+
+            const playersArray = Object.entries(players);
+            count.innerText = playersArray.length;
+
+            list.innerHTML = playersArray.map(([name, player]) => {
+                const progress = player.progress || 0;
+                const percent = (progress / 30) * 100;
+                const score = player.score || 0;
+                
+                return `
+                    <div class="student-card">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>👤 ${name}</span>
+                            <span>${progress}/30 · ${score} ✨</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ===== ОБНОВИТЬ ЛИДЕРБОРД =====
+        function updateLeaderboard(players) {
+            if (!players || Object.keys(players).length === 0) {
+                document.getElementById('leaderboard').innerHTML = '<div class="empty">пока нет результатов</div>';
+                document.getElementById('totalCount').innerText = '0';
+                document.getElementById('completedCount').innerText = '0';
+                document.getElementById('avgScore').innerText = '0';
+                return;
+            }
+
+            const playersArray = Object.entries(players);
+            
+            // Только те, у кого есть очки
+            const withScores = playersArray.filter(([_, p]) => p.score !== undefined);
+            
+            // Сортируем по очкам
+            withScores.sort((a, b) => (b[1].score || 0) - (a[1].score || 0));
+
+            // Статистика
+            const total = playersArray.length;
+            const completed = playersArray.filter(([_, p]) => p.progress === 30).length;
+            const avg = withScores.length > 0 
+                ? Math.round(withScores.reduce((acc, [_, p]) => acc + (p.score || 0), 0) / withScores.length) 
+                : 0;
+
+            document.getElementById('totalCount').innerText = total;
+            document.getElementById('completedCount').innerText = completed;
+            document.getElementById('avgScore').innerText = avg;
+
+            // Лидерборд (топ-10)
+            if (withScores.length === 0) {
+                document.getElementById('leaderboard').innerHTML = '<div class="empty">пока нет результатов</div>';
+                return;
+            }
+
+            let lbHtml = '';
+            withScores.slice(0, 10).forEach(([name, player], index) => {
+                const rankClass = index === 0 ? 'rank-1' : (index === 1 ? 'rank-2' : (index === 2 ? 'rank-3' : ''));
+                lbHtml += `
+                    <div class="leaderboard-item">
+                        <span class="${rankClass}">${index + 1}. ${name}</span>
+                        <span>${player.score || 0} ✨</span>
+                    </div>
+                `;
+            });
+
+            document.getElementById('leaderboard').innerHTML = lbHtml;
+        }
+
+        // ===== ОБНОВИТЬ ТАЙМЕР =====
+        function updateTimer(startTime, timeLimit) {
+            if (timerInterval) clearInterval(timerInterval);
+
+            timerInterval = setInterval(() => {
                 const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const left = Math.max(0, 900 - elapsed);
-                const m = Math.floor(left / 60);
-                const s = left % 60;
+                const remaining = Math.max(0, timeLimit - elapsed);
+                const mins = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                
                 document.getElementById('timer').innerText = 
-                    `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+                // Если время вышло - автоматически завершаем
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    db.ref(`games/${gameId}`).update({ status: 'finished' });
+                }
             }, 1000);
         }
 
+        // ===== СТАРТ ТЕСТА =====
         function startGame() {
+            if (!gameId) return;
+            
             db.ref(`games/${gameId}`).update({
                 status: 'active',
                 startTime: Date.now()
+            }).then(() => {
+                console.log('✅ Тест начат');
+            }).catch(error => {
+                console.error('Ошибка:', error);
+                alert('Ошибка запуска теста');
             });
         }
 
-        function endGame() {
-            db.ref(`games/${gameId}`).update({ status: 'finished' });
+        // ===== ФИНИШ ТЕСТА (ДОСРОЧНО) =====
+        function finishGame() {
+            if (!gameId) return;
+            
+            if (!confirm('Завершить тест досрочно? Все результаты будут сохранены.')) {
+                return;
+            }
+
+            db.ref(`games/${gameId}`).update({ 
+                status: 'finished' 
+            }).then(() => {
+                console.log('✅ Тест завершён досрочно');
+                if (timerInterval) clearInterval(timerInterval);
+                document.getElementById('timer').innerText = '00:00';
+                
+                // Показываем финальный лидерборд
+                db.ref(`games/${gameId}/players`).once('value', (snap) => {
+                    updateLeaderboard(snap.val());
+                });
+            }).catch(error => {
+                console.error('Ошибка:', error);
+                alert('Ошибка завершения теста');
+            });
         }
     </script>
 </body>
